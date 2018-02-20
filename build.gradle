@@ -19,6 +19,8 @@ allprojects {
     repositories {
         google()
         jcenter()
+        maven { url 'https://artifactory.coppernic.fr/plugins-release'}
+        maven { url 'https://artifactory.coppernic.fr/artifactory/libs-release'}
     }
 }
 

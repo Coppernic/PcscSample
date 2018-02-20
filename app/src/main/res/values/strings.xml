@@ -1,4 +1,22 @@
 <resources>
-    <string name="app_name">PcscSample</string>
+    <string name="app_name">PC/SC Sample</string>
     <string name="action_settings">Settings</string>
+    <string name="pcsc_explanation">Select Reader and insert/present card</string>
+    <string name="power_error">Error powering on reader. Make sure System Services is installed on the device</string>
+    <string name="wait_RFID_powered">Waiting RFID and Smart Card reader powering …</string>
+    <string name="sprinnerReaderHint">PC/SC Reader list</string>
+    <string name="enterApdu">Enter Apdu command here</string>
+    <string name="send">Send</string>
+    <string name="connect">Connect</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="pressButton">Press button to get ATR from card</string>
+    <string name="cardDetected">Card detected</string>
+    <string name="noData"><![CDATA[Data << No data]]></string>
+    <string name="dataSend"><![CDATA[Data >>]]></string>
+    <string name="dataReceived"><![CDATA[Data <<]]></string>
+    <string name="noStatus"><![CDATA[Status << No status]]></string>
+    <string name="errorConnectingCard">Error connecting card :</string>
+    <string name="connectReaderFirst">Connect Reader first</string>
+    <string name="atr">ATR :</string>
+    <string name="status">Status:</string>
 </resources>
