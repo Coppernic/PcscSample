@@ -3,17 +3,16 @@ package fr.coppernic.sample.pcsc.ui;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.Menu;
-import android.view.View;
+import android.view.MenuItem;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.weiwangcn.betterspinner.library.material.MaterialBetterSpinner;
@@ -40,8 +39,6 @@ public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.fab)
     FloatingActionButton fab;
-    @BindView(R.id.tvMessage)
-    TextView tvMessage;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.spReader)
@@ -50,19 +47,17 @@ public class MainActivity extends AppCompatActivity {
     EditText etResult;
     @BindView(R.id.swConnect)
     SwitchCompat swConnect;
-    @BindView(R.id.imgBtnClear)
-    ImageButton imgBtnClear;
-    @BindView(R.id.btnSend)
-    Button btnSend;
     @BindView(R.id.etApdu)
     EditText etApdu;
 
+    MenuItem itemClear;
     PcscReader reader;
 
     private final PowerListener powerListener = new PowerListener() {
         @Override
         public void onPowerUp(CpcResult.RESULT result, Peripheral peripheral) {
-            if (peripheral == ConePeripheral.RFID_ELYCTIS_LF214_USB && result == CpcResult.RESULT.NOT_CONNECTED) {
+            if (peripheral == ConePeripheral.RFID_ELYCTIS_LF214_USB &&
+                    (result == CpcResult.RESULT.NOT_CONNECTED || result == CpcResult.RESULT.OK)) {
                 Timber.d("RFID reader powered on");
                 ConePeripheral.PCSC_GEMALTO_CR30_USB.on(MainActivity.this);
             } else if (peripheral == ConePeripheral.PCSC_GEMALTO_CR30_USB && result == CpcResult.RESULT.OK) {
@@ -71,13 +66,13 @@ public class MainActivity extends AppCompatActivity {
                 showMessage(getString(R.string.pcsc_explanation));
                 updateSpinner();
             } else {
-                showMessage(getString(R.string.power_error));
+               showMessage(getString(R.string.power_error));
             }
         }
 
         @Override
         public void onPowerDown(CpcResult.RESULT result, Peripheral peripheral) {
-            Timber.d("Fp reader powered off");
+            Timber.d("RFID reader powered off");
         }
     };
 
@@ -85,16 +80,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        try {
-            String versionName = getPackageManager()
-                    .getPackageInfo(getPackageName(), 0).versionName;
-            setTitle(getString(R.string.app_name) + " " + versionName);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
+        initTitle();
 
         ButterKnife.bind(this);
-
         setSupportActionBar(toolbar);
 
         reader = new PcscReader(getApplicationContext());
@@ -102,20 +90,9 @@ public class MainActivity extends AppCompatActivity {
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_dropdown_item_1line, new ArrayList<String>());
         spReader.setAdapter(arrayAdapter);
-        showBinIfNotEmpty();
         etResult.clearFocus();
 
-        etApdu.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                boolean handled = false;
-                if (i == EditorInfo.IME_ACTION_SEND) {
-                    sendApdu();
-                    handled = true;
-                }
-                return handled;
-            }
-        });
+        etApdu.setOnEditorActionListener(editorActionListener);
     }
 
     @Override
@@ -123,9 +100,7 @@ public class MainActivity extends AppCompatActivity {
         Timber.d("onStart");
         super.onStart();
         showFAB(false);
-        swConnect.setEnabled(false);
         PowerManager.get().registerListener(powerListener);
-        showMessage(getString(R.string.wait_RFID_powered));
         powerOn(true);
     }
 
@@ -134,7 +109,6 @@ public class MainActivity extends AppCompatActivity {
         Timber.d("onStop");
         if (reader.isConnected()) {
             reader.disconnect();
-            swConnect.setChecked(false);
         }
         powerOn(false);
         PowerManager.get().unregisterListener(powerListener);
@@ -144,17 +118,20 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.menu_main, menu);
-        return false;
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        itemClear = menu.findItem(R.id.action_clear);
+        showBinIfNotEmpty();
+        return true;
     }
 
-
-    @OnClick(R.id.fab)
-    void readCard() {
-        if (reader.isConnected()) {
-            addLog(getString(R.string.atr) + reader.getAtr());
-        } else {
-            showMessage(getString(R.string.connectReaderFirst));
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_clear:
+                clear();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 
@@ -167,20 +144,21 @@ public class MainActivity extends AppCompatActivity {
                 swConnect.setChecked(false);
             } else {
                 addLog(getString(R.string.cardDetected));
+                addLog(getString(R.string.atr) + reader.getAtr());
                 showFAB(true);
             }
         } else {//Disconnect
             reader.disconnect();
+            addLog(getString(R.string.disconnected));
             showFAB(false);
         }
     }
 
-    @OnClick(R.id.imgBtnClear)
     void clear() {
         etResult.setText("");
     }
 
-    @OnClick(R.id.btnSend)
+    @OnClick(R.id.fab)
     void sendApdu() {
         try {
             addLog(getString(R.string.dataSend) + etApdu.getText().toString());
@@ -204,13 +182,31 @@ public class MainActivity extends AppCompatActivity {
     @OnTextChanged(R.id.etResult)
     void showBinIfNotEmpty() {
         if (etResult.getText().toString().isEmpty())
-            imgBtnClear.setVisibility(View.INVISIBLE);
+            itemClear.setVisible(false);
         else
-            imgBtnClear.setVisibility(View.VISIBLE);
+            itemClear.setVisible(true);
     }
 
-    public void showMessage(String value) {
-        tvMessage.setText(value);
+    TextView.OnEditorActionListener editorActionListener = new TextView.OnEditorActionListener() {
+        @Override
+        public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+            boolean handled = false;
+            if (i == EditorInfo.IME_ACTION_SEND) {
+                sendApdu();
+                handled = true;
+            }
+            return handled;
+        }
+    };
+
+    public void initTitle(){
+        try {
+            String versionName = getPackageManager()
+                    .getPackageInfo(getPackageName(), 0).versionName;
+            setTitle(getString(R.string.app_name) + " " + versionName);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     public void addLog(String data) {
@@ -218,23 +214,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void powerOn(boolean on) {
-        if (on) {
-            ConePeripheral.RFID_ELYCTIS_LF214_USB.on(this);
-        } else {
-            ConePeripheral.RFID_ELYCTIS_LF214_USB.off(this);
-        }
+        PowerManager.get().power(this, ConePeripheral.RFID_ELYCTIS_LF214_USB, on);
     }
 
     public void showFAB(boolean value) {
         if (value) {
             fab.show();
-            showMessage(getString(R.string.pressButton));
-
         } else {
             fab.hide();
-            showMessage(getString(R.string.pcsc_explanation));
         }
-        btnSend.setEnabled(value);
+        etApdu.setEnabled(value);
+        swConnect.setChecked(value);
+    }
+
+    public void showMessage(String message){
+        Snackbar.make(this.findViewById(android.R.id.content),message,Snackbar.LENGTH_LONG).show();
     }
 
     public void updateSpinner() {

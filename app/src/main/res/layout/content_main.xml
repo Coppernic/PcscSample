@@ -48,36 +48,10 @@
                 android:layout_marginEnd="8dp"
                 android:layout_marginTop="8dp"
                 android:background="@null"
-                app:layout_constraintBottom_toTopOf="@+id/etApdu"
+                app:layout_constraintBottom_toTopOf="@+id/etResult"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginRight="8dp" />
+                app:layout_constraintTop_toTopOf="parent" />
 
-            <EditText
-                android:id="@+id/etApdu"
-                android:layout_width="0dp"
-                android:layout_height="46dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:hint="@string/enterApdu"
-                android:imeOptions="actionSend"
-                android:singleLine="true"
-                android:digits="0123456789ABCDEF"
-                android:inputType="textCapCharacters|textNoSuggestions"
-                app:layout_constraintEnd_toStartOf="@+id/btnSend"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/spReader" />
-
-            <Button
-                android:id="@+id/btnSend"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:text="@string/send"
-                app:layout_constraintBottom_toBottomOf="@+id/etApdu"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginRight="8dp" />
 
             <EditText
                 android:id="@+id/etResult"
@@ -88,18 +62,18 @@
                 android:layout_marginEnd="8dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
+                android:background="@android:color/transparent"
                 android:clickable="false"
+                android:ellipsize="end"
                 android:focusable="false"
                 android:focusableInTouchMode="false"
                 android:gravity="top|start"
                 android:inputType="textMultiLine|textNoSuggestions"
-                android:background="@android:color/transparent"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/etApdu"
-                android:ellipsize="end" />
+                app:layout_constraintTop_toBottomOf="@+id/spReader" />
 
             <ImageButton
                 android:id="@+id/imgBtnClear"
@@ -120,23 +94,26 @@
         android:id="@+id/cardView"
         android:layout_width="match_parent"
         android:layout_height="89dp"
-        android:layout_marginBottom="80dp"
+        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cardPCSC">
 
-        <TextView
-            android:id="@+id/tvMessage"
+        <EditText
+            android:id="@+id/etApdu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginBottom="32dp"
-            android:layout_marginTop="32dp"
-            android:text="@string/pcsc_explanation"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+            android:layout_gravity="center_vertical"
+            android:digits="0123456789ABCDEF"
+            android:hint="@string/enterApdu"
+            android:imeOptions="actionSend"
+            android:inputType="textCapCharacters|textNoSuggestions"
+            android:singleLine="true" />
+
     </android.support.v7.widget.CardView>
 
 </android.support.constraint.ConstraintLayout>

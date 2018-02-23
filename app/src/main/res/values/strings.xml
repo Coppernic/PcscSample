@@ -19,4 +19,6 @@
     <string name="connectReaderFirst">Connect Reader first</string>
     <string name="atr">ATR :</string>
     <string name="status">Status:</string>
+    <string name="disconnected">Diconnect OK</string>
+    <string name="clear">Clear</string>
 </resources>

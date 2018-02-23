@@ -3,8 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="fr.coppernic.sample.pcsc.ui.MainActivity">
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_clear"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        android:title="@string/clear"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_delete_white_24px"/>
 </menu>

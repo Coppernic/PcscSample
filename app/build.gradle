@@ -42,7 +42,7 @@ dependencies {
     implementation 'com.github.d-max:spots-dialog:0.7@aar'
 
     // Coppernic
-    implementation(group: 'fr.coppernic.sdk.cpcutils', name: 'CpcUtilsLib', version: '6.13.0', ext: 'aar')
+    implementation 'fr.coppernic.sdk.cpcutils:CpcUtilsLib:6.14.0'
     implementation 'fr.coppernic.sdk.core:CpcCore:1.3.0'
     implementation 'fr.coppernic.sdk.pcsc:CpcPcsc:1.5.0'
 
