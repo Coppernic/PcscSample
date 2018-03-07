@@ -107,28 +107,47 @@ PowerManager.get().power(this, ConePeripheral.RFID_ELYCTIS_LF214_USB, false);
 ```java
    // PCSC
     private Scard sCard = null;
-    
+
     sCard = new Scard();
-    
+
 ```
- * List reader 
- 
+ * List reader
+
 ```java
      ArrayList<String> deviceList = new ArrayList<>();
      CpcResult.RESULT result = sCard.establishContext(context);
      if (result == CpcResult.RESULT.OK) {
         result = sCard.listReaders(deviceList);
      }
-    
+
 ```
 
 ### Read card
 
  * Connect to card and get ATR
- 
+
 ```java
     CpcResult.RESULT result = sCard.connect(readerName, 0, 0);
-    sCard.getAtr()
+    sCard.getAtr();
 ```
 
- 
+### Send PC/SC APDU command
+
+ * Send APDU command
+
+```java
+    String apduCommand = "FFCA000000"//get Data
+    byte[] apdu = CpcBytes.parseHexStringToArray(apduCommand);
+    ApduResponse apduResponse = new ApduResponse();
+    CpcResult.RESULT res = sCard.transmit(
+        new ProtocolControlInformation(ProtocolControlInformation.Protocol.T0)
+        , apdu
+        , new ProtocolControlInformation(ProtocolControlInformation.Protocol.T0)
+        , apduResponse);
+
+    if (res != CpcResult.RESULT.OK) {
+       //Error sending APDU
+    }else{
+      //get your response in apduResponse
+    }    
+```
