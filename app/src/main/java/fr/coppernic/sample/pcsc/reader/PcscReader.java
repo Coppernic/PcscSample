@@ -10,6 +10,7 @@ import fr.coppernic.sdk.pcsc.ProtocolControlInformation;
 import fr.coppernic.sdk.pcsc.Scard;
 import fr.coppernic.sdk.utils.core.CpcBytes;
 import fr.coppernic.sdk.utils.core.CpcResult;
+import fr.coppernic.sdk.utils.core.CpcResult.RESULT;
 import timber.log.Timber;
 
 /**
@@ -35,14 +36,14 @@ public class PcscReader {
      */
     public ArrayList<String> listReaders() {
         ArrayList<String> deviceList = new ArrayList<>();
-        CpcResult.RESULT result = sCard.establishContext(context);
-        if (result == CpcResult.RESULT.OK) {
+        RESULT result = sCard.establishContext(context);
+        if (result == RESULT.OK) {
             result = sCard.listReaders(deviceList);
-            if (result != CpcResult.RESULT.OK) {
-                Timber.d("Error list card : %s", result.toString());
+            if (result != RESULT.OK) {
+                Timber.d("Error listing card : %s", result.toString());
             }
         } else {
-            Timber.d("Error establish context : %s", result.toString());
+            Timber.d("Error establishing context : %s", result.toString());
             return null;
         }
 
@@ -53,11 +54,11 @@ public class PcscReader {
      * Connect to a card with the reader
      *
      * @param readerName name of the reader
-     * @return {@link CpcResult.RESULT}
+     * @return {@link RESULT}
      */
-    public CpcResult.RESULT connect(String readerName) {
-        CpcResult.RESULT result = sCard.connect(readerName, 0, 0);
-        if (result == CpcResult.RESULT.OK) {
+    public RESULT connect(String readerName) {
+        RESULT result = sCard.connect(readerName, 0, 0);
+        if (result == RESULT.OK) {
             isConnected = true;
         }
         return result;
@@ -65,12 +66,10 @@ public class PcscReader {
 
     /**
      * Disconnect reader
-     *
-     * @return {@link CpcResult.RESULT}
      */
-    public CpcResult.RESULT disconnect() {
+    public void disconnect() {
         isConnected = false;
-        return sCard.disconnect();
+        sCard.disconnect();
     }
 
     /**
@@ -97,10 +96,12 @@ public class PcscReader {
         ApduResponse apduResponse = new ApduResponse();
 
         Long initTime = SystemClock.elapsedRealtime();
-        CpcResult.RESULT res = sCard.transmit(new ProtocolControlInformation(ProtocolControlInformation.Protocol.T0), apdu, new ProtocolControlInformation(ProtocolControlInformation.Protocol.T0), apduResponse);
+        RESULT res = sCard.transmit(new ProtocolControlInformation(ProtocolControlInformation.Protocol.T0), apdu,
+                                    new ProtocolControlInformation(ProtocolControlInformation.Protocol.T0),
+                                    apduResponse);
         Timber.d("Transmit Time = %d", (SystemClock.elapsedRealtime() - initTime));
 
-        if (res != CpcResult.RESULT.OK) {
+        if (res != RESULT.OK) {
             Timber.d("Transmit : %s", res.toString());
             throw new CpcResult.ResultException(res);
         }

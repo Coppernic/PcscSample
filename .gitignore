@@ -116,3 +116,6 @@ local.properties
 android-support-v4.jar
 
 .idea
+*.iml
+Cpc*
+
