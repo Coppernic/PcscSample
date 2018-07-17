@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
         if (reader.isConnected()) {
             reader.disconnect();
         }
-        //powerOn(false);
+        powerOn(false);
         PowerManager.get().unregisterListener(powerListener);
         super.onStop();
     }
