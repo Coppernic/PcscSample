@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
                 showMessage(getString(R.string.pcsc_explanation));
                 updateSpinner();
             } else {
+                Timber.e("Result %s, Peripheral %s", result.toString(), peripheral.toString());
                 showMessage(getString(R.string.power_error));
             }
         }
