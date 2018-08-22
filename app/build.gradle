@@ -50,7 +50,7 @@ dependencies {
 
     // Coppernic
     implementation 'fr.coppernic.sdk.cpcutils:CpcUtilsLib:6.17.2'
-    implementation 'fr.coppernic.sdk.core:CpcCore:2.0.0'
+    implementation 'fr.coppernic.sdk.core:CpcCore:1.8.1'
     implementation 'fr.bipi.splash:splash:0.0.1'
     implementation 'fr.coppernic.sdk.pcsc:CpcPcsc:1.5.1'
 
