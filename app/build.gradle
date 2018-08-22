@@ -5,6 +5,11 @@ plugins {
 apply plugin: 'com.android.application'
 apply plugin: 'com.jakewharton.hugo'
 apply plugin: 'fr.coppernic.extensions'
+
+copper {
+    projectName = "PcscSample"
+}
+
 apply plugin: 'fr.coppernic.android'
 
 android {
