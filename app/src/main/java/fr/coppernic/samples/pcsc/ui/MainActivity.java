@@ -1,4 +1,4 @@
-package fr.coppernic.sample.pcsc.ui;
+package fr.coppernic.samples.pcsc.ui;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -25,7 +25,7 @@ import butterknife.OnClick;
 import butterknife.OnTextChanged;
 import fr.coppernic.sample.pcsc.BuildConfig;
 import fr.coppernic.sample.pcsc.R;
-import fr.coppernic.sample.pcsc.reader.PcscReader;
+import fr.coppernic.samples.pcsc.reader.PcscReader;
 import fr.coppernic.sdk.pcsc.ApduResponse;
 import fr.coppernic.sdk.power.PowerManager;
 import fr.coppernic.sdk.power.api.PowerListener;

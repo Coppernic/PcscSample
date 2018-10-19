@@ -1,9 +1,10 @@
-package fr.coppernic.sample.pcsc;
+package fr.coppernic.samples.pcsc;
 
 import android.app.Application;
 
 import com.squareup.leakcanary.LeakCanary;
 
+import fr.coppernic.sample.pcsc.BuildConfig;
 import timber.log.Timber;
 
 /**

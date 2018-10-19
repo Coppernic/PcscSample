@@ -1,4 +1,4 @@
-package fr.coppernic.sample.pcsc.reader;
+package fr.coppernic.samples.pcsc.reader;
 
 import android.content.Context;
 import android.os.SystemClock;
