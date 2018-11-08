@@ -1,9 +1,12 @@
 package fr.coppernic.samples.pcsc.ui;
 
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
@@ -42,6 +45,10 @@ import hugo.weaving.DebugLog;
 import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final String SMART_CARD_PERMISSION = "fr.coppernic.permission.SMART_CARD";
+    private static final String RFID_PERMISSION = "fr.coppernic.permission.RFID";
+    private static final int REQUEST_PERMISSION_CODE = 29;
 
     @BindView(R.id.fab)
     FloatingActionButton fab;
@@ -122,6 +129,14 @@ public class MainActivity extends AppCompatActivity {
         showFAB(false);
         PowerManager.get().registerListener(powerListener);
         powerOn(true);
+        swConnect.setEnabled(true);
+        updateSpinner();
+
+//        if (!checkPermissions()) {
+//            requestPermissions();
+//        } else {
+//            powerOn(true);
+//        }
     }
 
     @Override
@@ -134,6 +149,22 @@ public class MainActivity extends AppCompatActivity {
         PowerManager.get().unregisterListener(powerListener);
         super.onStop();
     }
+
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//        switch (requestCode) {
+//            case REQUEST_PERMISSION_CODE: {
+//                // If request is cancelled, the result arrays are empty.
+//                if (grantResults.length > 0
+//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                    powerOn(true);
+//                } else {
+//                    // For this sample, we ask permission again
+//                    requestPermissions();
+//                }
+//            }
+//        }
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -259,4 +290,30 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+//    private boolean checkPermissions() {
+//        if (CpcOs.isConeN()) {
+//            boolean scPermission = ContextCompat.checkSelfPermission(this, SMART_CARD_PERMISSION) == PackageManager.PERMISSION_GRANTED;
+//            boolean rfidPermission = ContextCompat.checkSelfPermission(this, RFID_PERMISSION) == PackageManager.PERMISSION_GRANTED;
+//
+//            return scPermission && rfidPermission;
+//        } else {
+//            return true;
+//        }
+//    }
+//
+//    private void requestPermissions() {
+//        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+//                SMART_CARD_PERMISSION) || ActivityCompat.shouldShowRequestPermissionRationale(this,
+//                RFID_PERMISSION)) {
+//            // For this sample we do not display rationale, we just ask for permission if not granted
+//            ActivityCompat.requestPermissions(this,
+//                    new String[]{SMART_CARD_PERMISSION, RFID_PERMISSION},
+//                    REQUEST_PERMISSION_CODE);
+//        } else {
+//            // No explanation needed; request the permission
+//            ActivityCompat.requestPermissions(this,
+//                    new String[]{SMART_CARD_PERMISSION, RFID_PERMISSION},
+//                    REQUEST_PERMISSION_CODE);
+//        }
+//    }
 }

@@ -3,6 +3,8 @@
     package="fr.coppernic.sample.pcsc">
 
     <uses-permission android:name="com.id2mp.permissions.SCR"/>
+    <uses-permission android:name="fr.coppernic.permission.SMART_CARD"/>
+    <uses-permission android:name="fr.coppernic.permission.RFID"/>
 
     <application
         android:name="fr.coppernic.samples.pcsc.App"
@@ -24,7 +26,7 @@
                   android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
+                <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <meta-data
