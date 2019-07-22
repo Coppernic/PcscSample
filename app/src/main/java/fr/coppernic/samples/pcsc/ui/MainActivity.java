@@ -1,12 +1,9 @@
 package fr.coppernic.samples.pcsc.ui;
 
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
@@ -39,7 +36,7 @@ import fr.coppernic.sdk.power.impl.idplatform.IdPlatformPeripheral;
 import fr.coppernic.sdk.utils.core.CpcBytes;
 import fr.coppernic.sdk.utils.core.CpcResult;
 import fr.coppernic.sdk.utils.core.CpcResult.RESULT;
-import fr.coppernic.sdk.utils.helpers.CpcOs;
+import fr.coppernic.sdk.utils.helpers.OsHelper;
 import fr.coppernic.sdk.utils.ui.TextAppender;
 import hugo.weaving.DebugLog;
 import timber.log.Timber;
@@ -70,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onPowerUp(RESULT result, Peripheral peripheral) {
             if ((peripheral == ConePeripheral.RFID_ELYCTIS_LF214_USB)
-                && ((result == RESULT.NOT_CONNECTED) || (result == RESULT.OK))) {
+                    && ((result == RESULT.NOT_CONNECTED) || (result == RESULT.OK))) {
                 Timber.d("RFID reader powered on");
                 ConePeripheral.PCSC_GEMALTO_CR30_USB.on(MainActivity.this);
             } else if ( /*peripheral == ConePeripheral.PCSC_GEMALTO_CR30_USB
@@ -114,8 +111,8 @@ public class MainActivity extends AppCompatActivity {
         reader = new PcscReader(getApplicationContext());
         //Init empty spinner
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this,
-                                                               android.R.layout.simple_dropdown_item_1line,
-                                                               new ArrayList<String>());
+                android.R.layout.simple_dropdown_item_1line,
+                new ArrayList<String>());
         spReader.setAdapter(arrayAdapter);
         etResult.clearFocus();
 
@@ -212,13 +209,13 @@ public class MainActivity extends AppCompatActivity {
             ApduResponse response = reader.sendApdu(etApdu.getText().toString());
             if (response.getStatus() != null) {
                 addLog(getString(R.string.status) +
-                       CpcBytes.byteArrayToString(response.getStatus(), response.getStatus().length));
+                        CpcBytes.byteArrayToString(response.getStatus(), response.getStatus().length));
             } else {
                 addLog(getString(R.string.noStatus));
             }
             if (response.getData() != null) {
                 addLog(getString(R.string.dataReceived) +
-                       CpcBytes.byteArrayToString(response.getData(), response.getData().length));
+                        CpcBytes.byteArrayToString(response.getData(), response.getData().length));
             } else {
                 addLog(getString(R.string.noData));
             }
@@ -272,8 +269,8 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<String> deviceList = reader.listReaders();
         if (deviceList != null) {
             ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this,
-                                                                   android.R.layout.simple_dropdown_item_1line,
-                                                                   deviceList);
+                    android.R.layout.simple_dropdown_item_1line,
+                    deviceList);
             spReader.setAdapter(arrayAdapter);
         }
     }
@@ -281,9 +278,9 @@ public class MainActivity extends AppCompatActivity {
     @DebugLog
     @NonNull
     private Peripheral getPeripheral() {
-        if (CpcOs.isCone()) {
+        if (OsHelper.isCone() || OsHelper.isConeV2()) {
             return ConePeripheral.RFID_ELYCTIS_LF214_USB;
-        } else if (CpcOs.isIdPlatform()) {
+        } else if (OsHelper.isIdPlatform()) {
             return IdPlatformPeripheral.SMARTCARD;
         } else {
             return DummyPeripheral.NO_OP;
