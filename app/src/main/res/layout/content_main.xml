@@ -32,11 +32,13 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginEnd="8dp"
                 android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
                 android:hint="@string/sprinnerReaderHint"
                 android:textColorHint="#05ab9a"
                 app:layout_constraintEnd_toStartOf="@+id/swConnect"
                 app:layout_constraintStart_toStartOf="parent"
-                app:met_floatingLabel="normal" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:met_floatingLabel="normal"/>
 
             <android.support.v7.widget.SwitchCompat
                 android:id="@+id/swConnect"

@@ -10,10 +10,9 @@ buildscript {
         maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.1'
+        classpath 'com.android.tools.build:gradle:3.3.2'
         classpath 'com.noveogroup.android:check:1.2.4'
-        classpath 'com.jakewharton.hugo:hugo-plugin:1.2.1'
-        classpath "gradle.plugin.coppernic:android-config:0.3.2"
+        classpath "gradle.plugin.coppernic:android-config:0.3.9"
     }
 }
 
@@ -21,6 +20,7 @@ allprojects {
     repositories {
         google()
         jcenter()
+        mavenCentral()
         maven { url 'https://artifactory.coppernic.fr/plugins-release' }
         maven { url 'https://artifactory.coppernic.fr/artifactory/libs-release' }
         mavenLocal()
