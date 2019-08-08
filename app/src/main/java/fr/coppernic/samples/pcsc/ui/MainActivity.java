@@ -38,7 +38,6 @@ import fr.coppernic.sdk.utils.core.CpcResult;
 import fr.coppernic.sdk.utils.core.CpcResult.RESULT;
 import fr.coppernic.sdk.utils.helpers.OsHelper;
 import fr.coppernic.sdk.utils.ui.TextAppender;
-import hugo.weaving.DebugLog;
 import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity {
@@ -275,10 +274,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @DebugLog
     @NonNull
     private Peripheral getPeripheral() {
-        if (OsHelper.isCone() || OsHelper.isConeV2()) {
+        if (OsHelper.isCone()) {
             return ConePeripheral.RFID_ELYCTIS_LF214_USB;
         } else if (OsHelper.isIdPlatform()) {
             return IdPlatformPeripheral.SMARTCARD;

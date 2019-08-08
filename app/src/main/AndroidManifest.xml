@@ -20,7 +20,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
-        <activity android:name="fr.bipi.lib.splash.PermissionSplashScreen"
+        <activity android:name="fr.coppernic.lib.splash.PermissionSplashScreen"
                   android:label="@string/app_name"
                   android:screenOrientation="portrait"
                   android:theme="@style/AppTheme.NoActionBar">
