@@ -69,7 +69,7 @@ dependencies {
 
     // Coppernic
     implementation 'fr.coppernic.sdk.cpcutils:CpcUtilsLib:6.18.4'
-    implementation 'fr.coppernic.sdk.core:CpcCore:1.8.14'
+    implementation 'fr.coppernic.sdk.core:CpcCore:1.8.16'
 
     implementation 'fr.coppernic.lib:splash:0.1.0'
     implementation 'fr.coppernic.sdk.pcsc:CpcPcsc:1.5.1'
