@@ -1,10 +1,10 @@
 # PcscSample
-Sample application for PC/SC reader on C-One e-ID
+Sample application for PC/SC reader on C-One e-ID.
 
 ## Prerequisites
 
 CpcSystemServices shall be installed on your device.
-Please install the last version available on FDroid available on www.coppernic.fr/fdroid.apk
+Please install the latest version available on CopperApps directly from the web browser of your PDA as an APK through https://coppernic.fr/copperapps.apk
 
 
 ## Set up
@@ -31,7 +31,7 @@ dependencies {
 
 ### Power management
 
- * Implements power listener
+ * Implements power listener:
 
 ```java
 
@@ -61,7 +61,7 @@ dependencies {
 
 ```
 
- * Register the listener
+ * Register the listener:
 
 ```java
 @Override
@@ -72,7 +72,7 @@ dependencies {
     }
 ```
 
- * Power reader on
+ * Power reader on:
 
 ```java
 // Powers on RFID reader
@@ -80,7 +80,7 @@ PowerManager.get().power(this, ConePeripheral.RFID_ELYCTIS_LF214_USB, true);
 // The listener will be called with the result
 ```
 
- * Power off when you are done
+ * Power off when you are done:
 
 ```java
 // Powers off RFID reader
@@ -88,7 +88,7 @@ PowerManager.get().power(this, ConePeripheral.RFID_ELYCTIS_LF214_USB, false);
 // The listener will be called with the result
 ```
 
- * unregister listener resources
+ * Unregister listener resources:
 
 ```java
 @Override
@@ -102,7 +102,7 @@ PowerManager.get().power(this, ConePeripheral.RFID_ELYCTIS_LF214_USB, false);
 ### Reader initialization
 
 #### Create reader object
- * Declare a Scard object and instantiate
+ * Declare a Scard object and instantiate:
 
 ```java
    // PCSC
@@ -111,7 +111,7 @@ PowerManager.get().power(this, ConePeripheral.RFID_ELYCTIS_LF214_USB, false);
     sCard = new Scard();
 
 ```
- * List reader
+ * List reader:
 
 ```java
      ArrayList<String> deviceList = new ArrayList<>();
@@ -124,7 +124,7 @@ PowerManager.get().power(this, ConePeripheral.RFID_ELYCTIS_LF214_USB, false);
 
 ### Read card
 
- * Connect to card and get ATR
+ * Connect to card and get ATR:
 
 ```java
     CpcResult.RESULT result = sCard.connect(readerName, 0, 0);
@@ -133,7 +133,7 @@ PowerManager.get().power(this, ConePeripheral.RFID_ELYCTIS_LF214_USB, false);
 
 ### Send PC/SC APDU command
 
- * Send APDU command
+ * Send APDU command:
 
 ```java
     String apduCommand = "FFCA000000"//get Data
