@@ -74,9 +74,5 @@ dependencies {
     implementation 'fr.coppernic.lib:splash:0.1.0'
     implementation 'fr.coppernic.sdk.pcsc:CpcPcsc:1.5.1'
 
-    // Butter knife
-    implementation 'com.jakewharton:butterknife:8.8.1'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
-
     implementation "com.android.support:cardview-v7:$support"
 }
