@@ -16,12 +16,12 @@ copper {
 apply plugin: 'fr.coppernic.android'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
 
     defaultConfig {
         applicationId "fr.coppernic.samples.pcsc"
         minSdkVersion 17
-        targetSdkVersion 27
+        targetSdkVersion 28
         vectorDrawables.useSupportLibrary = true
         versionCode versioning.info.versionCode
         versionName versioning.info.display
