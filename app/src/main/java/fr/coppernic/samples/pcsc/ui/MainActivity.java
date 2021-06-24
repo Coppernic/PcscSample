@@ -1,15 +1,19 @@
 package fr.coppernic.samples.pcsc.ui;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SwitchCompat;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.appcompat.widget.Toolbar;
+
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -19,10 +23,6 @@ import com.weiwangcn.betterspinner.library.material.MaterialBetterSpinner;
 
 import java.util.ArrayList;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import butterknife.OnTextChanged;
 import fr.coppernic.sample.pcsc.BuildConfig;
 import fr.coppernic.sample.pcsc.R;
 import fr.coppernic.samples.pcsc.reader.PcscReader;
@@ -46,17 +46,11 @@ public class MainActivity extends AppCompatActivity {
     private static final String RFID_PERMISSION = "fr.coppernic.permission.RFID";
     private static final int REQUEST_PERMISSION_CODE = 29;
 
-    @BindView(R.id.fab)
     FloatingActionButton fab;
-    @BindView(R.id.toolbar)
     Toolbar toolbar;
-    @BindView(R.id.spReader)
     MaterialBetterSpinner spReader;
-    @BindView(R.id.etResult)
     EditText etResult;
-    @BindView(R.id.swConnect)
     SwitchCompat swConnect;
-    @BindView(R.id.etApdu)
     EditText etApdu;
 
     private MenuItem itemClear;
@@ -104,7 +98,44 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         initTitle();
 
-        ButterKnife.bind(this);
+        fab = findViewById(R.id.fab);
+        toolbar = findViewById(R.id.toolbar);
+        spReader = findViewById(R.id.spReader);
+        etResult = findViewById(R.id.etResult);
+        swConnect = findViewById(R.id.swConnect);
+        etApdu = findViewById(R.id.etApdu);
+
+        swConnect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                connectCard();
+            }
+        });
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendApdu();
+            }
+        });
+
+        etResult.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                showBinIfNotEmpty();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
         setSupportActionBar(toolbar);
 
         reader = new PcscReader(getApplicationContext());
@@ -182,7 +213,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @OnClick(R.id.swConnect)
     void connectCard() {
         if (!reader.isConnected()) {//Connect reader
             RESULT result;
@@ -201,7 +231,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @OnClick(R.id.fab)
     void sendApdu() {
         try {
             addLog(getString(R.string.dataSend) + etApdu.getText().toString());
@@ -223,7 +252,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @OnTextChanged(R.id.etResult)
     void showBinIfNotEmpty() {
         if (itemClear != null) {
             if (etResult.getText().toString().isEmpty()) {
