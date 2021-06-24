@@ -40,7 +40,7 @@ import fr.coppernic.sdk.utils.helpers.OsHelper;
 import fr.coppernic.sdk.utils.ui.TextAppender;
 import timber.log.Timber;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity {
 
     private static final String SMART_CARD_PERMISSION = "fr.coppernic.permission.SMART_CARD";
     private static final String RFID_PERMISSION = "fr.coppernic.permission.RFID";
@@ -105,8 +105,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         swConnect = findViewById(R.id.swConnect);
         etApdu = findViewById(R.id.etApdu);
 
-        swConnect.setOnClickListener(this);
-        fab.setOnClickListener(this);
+        swConnect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                connectCard();
+            }
+        });
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendApdu();
+            }
+        });
 
         etResult.addTextChangedListener(new TextWatcher() {
             @Override
@@ -299,18 +310,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return IdPlatformPeripheral.SMARTCARD;
         } else {
             return DummyPeripheral.NO_OP;
-        }
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.swConnect:
-                connectCard();
-                break;
-            case R.id.fab:
-                sendApdu();
-                break;
         }
     }
 
