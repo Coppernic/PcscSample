@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
 
+import android.os.SystemClock;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -67,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
                        && */result == RESULT.OK) {
                 Timber.d("Smart Card reader powered on");
                 swConnect.setEnabled(true);
+                //Wait for USB device to be ready
+                SystemClock.sleep(1000);
                 showMessage(getString(R.string.pcsc_explanation));
                 updateSpinner();
             } else {
