@@ -307,10 +307,13 @@ public class MainActivity extends AppCompatActivity {
     @NonNull
     private Peripheral getPeripheral() {
         if (OsHelper.isCone()) {
+            Timber.v("Device : C-One");
             return ConePeripheral.RFID_ELYCTIS_LF214_USB;
         } else if (OsHelper.isIdPlatform()) {
-            return IdPlatformPeripheral.SMARTCARD;
+            Timber.v("Device : IdPlatform");
+            return IdPlatformPeripheral.SAM_MKGROUP;
         } else {
+            Timber.v("Device : No Op");
             return DummyPeripheral.NO_OP;
         }
     }
