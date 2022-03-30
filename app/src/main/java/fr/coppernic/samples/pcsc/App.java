@@ -2,9 +2,6 @@ package fr.coppernic.samples.pcsc;
 
 import android.app.Application;
 
-import com.squareup.leakcanary.LeakCanary;
-
-import fr.coppernic.sample.pcsc.BuildConfig;
 import timber.log.Timber;
 
 /**
@@ -16,8 +13,5 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         Timber.plant(new Timber.DebugTree());
-        if (BuildConfig.DEBUG) {
-            LeakCanary.install(this);
-        }
     }
 }
