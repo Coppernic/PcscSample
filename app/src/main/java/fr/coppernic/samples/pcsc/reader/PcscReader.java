@@ -2,15 +2,16 @@ package fr.coppernic.samples.pcsc.reader;
 
 import android.content.Context;
 import android.os.SystemClock;
+import android.util.Log;
 
 import java.util.ArrayList;
 
-import fr.coppernic.sdk.pcsc.ApduResponse;
-import fr.coppernic.sdk.pcsc.ProtocolControlInformation;
-import fr.coppernic.sdk.pcsc.Scard;
+import fr.coppernic.sdk.pcsc2.ApduResponse;
+import fr.coppernic.sdk.pcsc2.SCard;
 import fr.coppernic.sdk.utils.core.CpcBytes;
 import fr.coppernic.sdk.utils.core.CpcResult;
 import fr.coppernic.sdk.utils.core.CpcResult.RESULT;
+import io.reactivex.Single;
 import timber.log.Timber;
 
 /**
@@ -19,15 +20,30 @@ import timber.log.Timber;
 
 public class PcscReader {
     // PCSC
-    private Scard sCard = null;
+    private SCard sCard = null;
     private boolean isConnected = false;
 
     private Context context;
 
-    public PcscReader(Context context) {
-        this.context = context;
-        sCard = new Scard();
+    private String TAG = "PcscReader";
+
+    private PcscReader(SCard sCard) {
+        Log.d(TAG, "create SCard");
+        this.sCard = sCard;
     }
+
+    public static Single<PcscReader> createPcscReader(Context context) {
+        return SCard.Companion.createSCard(context).map(
+            it -> {
+                if (it.establishContext() == RESULT.OK) {
+                    return new PcscReader(it);
+                } else {
+                    throw new Exception("Couldn't establish connection with PcscReader");
+                }
+            }
+        );
+    }
+
 
     /**
      * Get list of available reader
@@ -36,15 +52,9 @@ public class PcscReader {
      */
     public ArrayList<String> listReaders() {
         ArrayList<String> deviceList = new ArrayList<>();
-        RESULT result = sCard.establishContext(context);
-        if (result == RESULT.OK) {
-            result = sCard.listReaders(deviceList);
-            if (result != RESULT.OK) {
-                Timber.d("Error listing card : %s", result.toString());
-            }
-        } else {
-            Timber.d("Error establishing context : %s", result.toString());
-            return null;
+        RESULT result = sCard.listReaders(deviceList);
+        if (result != RESULT.OK) {
+           Timber.d("Error listing card : %s", result.toString());
         }
 
         return deviceList;
@@ -57,7 +67,7 @@ public class PcscReader {
      * @return {@link RESULT}
      */
     public RESULT connect(String readerName) {
-        RESULT result = sCard.connect(readerName, 0, 0);
+        RESULT result = sCard.connect(readerName);
         if (result == RESULT.OK) {
             isConnected = true;
         }
@@ -96,9 +106,7 @@ public class PcscReader {
         ApduResponse apduResponse = new ApduResponse();
 
         Long initTime = SystemClock.elapsedRealtime();
-        RESULT res = sCard.transmit(new ProtocolControlInformation(ProtocolControlInformation.Protocol.T0), apdu,
-                                    new ProtocolControlInformation(ProtocolControlInformation.Protocol.T0),
-                                    apduResponse);
+        RESULT res = sCard.transmit(apdu, apduResponse);
         Timber.d("Transmit Time = %d", (SystemClock.elapsedRealtime() - initTime));
 
         if (res != RESULT.OK) {

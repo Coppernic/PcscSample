@@ -24,7 +24,7 @@ android {
 
     defaultConfig {
         applicationId "fr.coppernic.samples.pcsc"
-        minSdkVersion 17
+        minSdkVersion 27
         targetSdkVersion 28
         vectorDrawables.useSupportLibrary = true
         versionCode versioning.info.versionCode
@@ -117,7 +117,8 @@ dependencies {
     implementation 'fr.coppernic.sdk.cpcutils:CpcUtilsLib:6.19.1'
     implementation 'fr.coppernic.sdk.core:CpcCore:2.1.12'
     implementation 'fr.coppernic.lib:splash:0.3.0'
-    implementation 'fr.coppernic.sdk.pcsc:CpcPcsc:1.5.4'
+
+    implementation 'fr.coppernic.sdk.pcsc2:pcsclib:master'
 
     implementation "androidx.cardview:cardview:1.0.0"
 }
