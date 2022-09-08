@@ -30,6 +30,7 @@ import fr.coppernic.sdk.pcsc.ApduResponse;
 import fr.coppernic.sdk.power.PowerManager;
 import fr.coppernic.sdk.power.api.PowerListener;
 import fr.coppernic.sdk.power.api.peripheral.Peripheral;
+import fr.coppernic.sdk.power.impl.access.AccessPeripheral;
 import fr.coppernic.sdk.power.impl.cone.ConePeripheral;
 import fr.coppernic.sdk.power.impl.dummy.DummyPeripheral;
 import fr.coppernic.sdk.power.impl.idplatform.IdPlatformPeripheral;
@@ -310,6 +311,8 @@ public class MainActivity extends AppCompatActivity {
             return ConePeripheral.RFID_ELYCTIS_LF214_USB;
         } else if (OsHelper.isIdPlatform()) {
             return IdPlatformPeripheral.SMARTCARD;
+        } else if (OsHelper.isAccess()){
+            return AccessPeripheral.RFID_HID_CK_MINI_USB;
         } else {
             return DummyPeripheral.NO_OP;
         }
