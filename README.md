@@ -1,5 +1,5 @@
 # PcscSample
-Sample application for PC/SC reader on C-One e-ID and Access-ER.
+Sample application for PC/SC reader on C-One2 e-ID and Access-ER HID.
 
 ## Prerequisites
 
@@ -33,7 +33,7 @@ dependencies {
 
  * Define used peripheral
 
- Each terminal (COne, Access-ER, IdPlatform), can contain one or more Pcsc reader.
+ Each terminal (C-One2 e-ID, Access-ER HID, IdPlatform), can contain one or more Pcsc reader.
  Check their availability in technical specifications.
 
 https://www.coppernic.fr/c-one-2-e-id/
@@ -41,17 +41,23 @@ https://www.coppernic.fr/access-er/
 https://www.coppernic.fr/access-er-e-id/
 https://www.coppernic.fr/id-platform/
 
-```java
+C-One2 e-ID contains two peripherals available with PCSC library :
+- Contactless card reader RFID Elyctis reader
+- Contact card reader
 
+Access-ER HID contains one peripheral available with PCSC library :
+- Contactless card reader HID OMNIKEY 5127 CK-Mini
+
+```java
     private Peripheral getPeripheral() {
         if (OsHelper.isCone()) {
-            return ConePeripheral.RFID_ELYCTIS_LF214_USB;
-//            return ConePeripheral.PCSC_GEMALTO_CR30_USB;
-//            return ConePeripheral.PCSC_MICROCHIP_SEC1210_USB;
+            return ConePeripheral.RFID_ELYCTIS_LF214_USB; // Contactless card reader RFID Elyctis reader
+//            return ConePeripheral.PCSC_GEMALTO_CR30_USB; // Contact card reader
+//            return ConePeripheral.PCSC_MICROCHIP_SEC1210_USB; // Contact card reader
         } else if (OsHelper.isIdPlatform()) {
             return IdPlatformPeripheral.SMARTCARD;
         } else if (OsHelper.isAccess()){
-            return AccessPeripheral.RFID_HID_CK_MINI_USB;
+            return AccessPeripheral.RFID_HID_CK_MINI_USB; // Contactless card reader HID OMNIKEY 5127 CK-Mini
         } else {
             return DummyPeripheral.NO_OP;
         }
