@@ -52,8 +52,8 @@ Access-ER HID contains one peripheral available with PCSC library :
     private Peripheral getPeripheral() {
         if (OsHelper.isCone()) {
             return ConePeripheral.RFID_ELYCTIS_LF214_USB; // Contactless card reader RFID Elyctis reader
-//            return ConePeripheral.PCSC_GEMALTO_CR30_USB; // Contact card reader
-//            return ConePeripheral.PCSC_MICROCHIP_SEC1210_USB; // Contact card reader
+//            return ConePeripheral.PCSC_GEMALTO_CR30_USB; // Default contact card reader
+//            return ConePeripheral.PCSC_MICROCHIP_SEC1210_USB; // New contact card reader available on latest terminals. Contact Coppernic support for informations
         } else if (OsHelper.isIdPlatform()) {
             return IdPlatformPeripheral.SMARTCARD;
         } else if (OsHelper.isAccess()){
