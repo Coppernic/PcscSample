@@ -1,5 +1,5 @@
 # PcscSample
-Sample application for PC/SC reader on C-One e-ID
+Sample application for PC/SC reader on C-One e-ID and Access-ER.
 
 ## Prerequisites
 
@@ -21,9 +21,9 @@ repositories {
 dependencies {
 // [...]
     // Coppernic
-    implementation 'fr.coppernic.sdk.cpcutils:CpcUtilsLib:6.14.0'
-    implementation 'fr.coppernic.sdk.core:CpcCore:1.3.0'
-    implementation 'fr.coppernic.sdk.pcsc:CpcPcsc:1.5.0'
+    implementation 'fr.coppernic.sdk.cpcutils:CpcUtilsLib:6.19.1'
+    implementation 'fr.coppernic.sdk.core:CpcCore:2.1.12'
+    implementation 'fr.coppernic.sdk.pcsc:CpcPcsc:1.5.4'
 // [...]
 }
 
@@ -31,31 +31,53 @@ dependencies {
 
 ### Power management
 
- * Implements power listener
+ * Define used peripheral
+
+ Each terminal (COne, Access-ER, IdPlatform), can contain one or more Pcsc reader.
+ Check their availability in technical specifications.
+
+https://www.coppernic.fr/c-one-2-e-id/
+https://www.coppernic.fr/access-er/
+https://www.coppernic.fr/access-er-e-id/
+https://www.coppernic.fr/id-platform/
+
+```java
+
+    private Peripheral getPeripheral() {
+        if (OsHelper.isCone()) {
+            return ConePeripheral.RFID_ELYCTIS_LF214_USB;
+//            return ConePeripheral.PCSC_GEMALTO_CR30_USB;
+//            return ConePeripheral.PCSC_MICROCHIP_SEC1210_USB;
+        } else if (OsHelper.isIdPlatform()) {
+            return IdPlatformPeripheral.SMARTCARD;
+        } else if (OsHelper.isAccess()){
+            return AccessPeripheral.RFID_HID_CK_MINI_USB;
+        } else {
+            return DummyPeripheral.NO_OP;
+        }
+    }
+
+```
+
+* Implements power listener
 
 ```java
 
   private final PowerListener powerListener = new PowerListener() {
         @Override
         public void onPowerUp(CpcResult.RESULT result, Peripheral peripheral) {
-            if (peripheral == ConePeripheral.RFID_ELYCTIS_LF214_USB &&
-                    (result == CpcResult.RESULT.NOT_CONNECTED || result == CpcResult.RESULT.OK)) {
-                Timber.d("RFID reader powered on");
-                ConePeripheral.PCSC_GEMALTO_CR30_USB.on(MainActivity.this);
-            } else if (peripheral == ConePeripheral.PCSC_GEMALTO_CR30_USB && result == CpcResult.RESULT.OK) {
+            if ((peripheral == getPeripheral())
+                    && ((result == RESULT.NOT_CONNECTED) || (result == RESULT.OK))) {
                 Timber.d("Smart Card reader powered on");
-                swConnect.setEnabled(true);
-                showMessage(getString(R.string.pcsc_explanation));
-                updateSpinner();
-            }
-            else{
-                //Error while powering fingerprint
+                // (...)
+                else{
+                // Error while powering peripheral
             }
         }
 
         @Override
         public void onPowerDown(CpcResult.RESULT result, Peripheral peripheral) {
-           //FP reader power off
+           // peripheral powered off
         }
     };
 
