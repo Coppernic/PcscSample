@@ -60,12 +60,8 @@ public class MainActivity extends AppCompatActivity {
     private final PowerListener powerListener = new PowerListener() {
         @Override
         public void onPowerUp(RESULT result, Peripheral peripheral) {
-            if ((peripheral == ConePeripheral.RFID_ELYCTIS_LF214_USB)
+            if ((peripheral == getPeripheral())
                     && ((result == RESULT.NOT_CONNECTED) || (result == RESULT.OK))) {
-                Timber.d("RFID reader powered on");
-                ConePeripheral.PCSC_GEMALTO_CR30_USB.on(MainActivity.this);
-            } else if ( /*peripheral == ConePeripheral.PCSC_GEMALTO_CR30_USB
-                       && */result == RESULT.OK) {
                 Timber.d("Smart Card reader powered on");
                 swConnect.setEnabled(true);
                 //Wait for USB device to be ready
