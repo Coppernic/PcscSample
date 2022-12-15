@@ -19,7 +19,6 @@ import com.weiwangcn.betterspinner.library.material.MaterialBetterSpinner;
 
 import java.util.ArrayList;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
@@ -30,14 +29,9 @@ import fr.coppernic.sdk.pcsc.ApduResponse;
 import fr.coppernic.sdk.power.PowerManager;
 import fr.coppernic.sdk.power.api.PowerListener;
 import fr.coppernic.sdk.power.api.peripheral.Peripheral;
-import fr.coppernic.sdk.power.impl.access.AccessPeripheral;
-import fr.coppernic.sdk.power.impl.cone.ConePeripheral;
-import fr.coppernic.sdk.power.impl.dummy.DummyPeripheral;
-import fr.coppernic.sdk.power.impl.idplatform.IdPlatformPeripheral;
 import fr.coppernic.sdk.utils.core.CpcBytes;
 import fr.coppernic.sdk.utils.core.CpcResult;
 import fr.coppernic.sdk.utils.core.CpcResult.RESULT;
-import fr.coppernic.sdk.utils.helpers.OsHelper;
 import fr.coppernic.sdk.utils.ui.TextAppender;
 import timber.log.Timber;
 
@@ -60,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private final PowerListener powerListener = new PowerListener() {
         @Override
         public void onPowerUp(RESULT result, Peripheral peripheral) {
-            if ((peripheral == getPeripheral())
+            if ((peripheral == TerminalPeripheral.getPeripheral())
                     && ((result == RESULT.NOT_CONNECTED) || (result == RESULT.OK))) {
                 Timber.d("Smart Card reader powered on");
                 swConnect.setEnabled(true);
@@ -274,7 +268,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void powerOn(boolean on) {
-        PowerManager.get().power(this, getPeripheral(), on);
+        PowerManager.get().power(this, TerminalPeripheral.getPeripheral(), on);
     }
 
     private void showFAB(boolean value) {
@@ -298,19 +292,6 @@ public class MainActivity extends AppCompatActivity {
                     android.R.layout.simple_dropdown_item_1line,
                     deviceList);
             spReader.setAdapter(arrayAdapter);
-        }
-    }
-
-    @NonNull
-    private Peripheral getPeripheral() {
-        if (OsHelper.isCone()) {
-            return ConePeripheral.RFID_ELYCTIS_LF214_USB;
-        } else if (OsHelper.isIdPlatform()) {
-            return IdPlatformPeripheral.SMARTCARD;
-        } else if (OsHelper.isAccess()){
-            return AccessPeripheral.RFID_HID_CK_MINI_USB;
-        } else {
-            return DummyPeripheral.NO_OP;
         }
     }
 

@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">PC/SC Sample</string>
+    <string name="app_name_hiddev">PC/SC Sample HID</string>
+    <string name="app_name_smartcard">PC/SC Sample SmartCard</string>
     <string name="action_settings">Settings</string>
     <string name="pcsc_explanation">Select Reader and insert/present card</string>
     <string name="power_error">Error powering on reader. Make sure System or Core Services is installed on device</string>
