@@ -1,0 +1,13 @@
+// -------------------- //
+// ---    Jacoco    --- //
+// -------------------- //
+apply plugin: 'com.hiya.jacoco-android'
+
+jacoco {
+    toolVersion = "0.8.7"
+}
+
+tasks.withType(Test) {
+    jacoco.includeNoLocationClasses = true
+    jacoco.excludes = ['jdk.internal.*']
+}

@@ -5,6 +5,7 @@ plugins {
 apply plugin: 'com.android.application'
 apply plugin: 'fr.coppernic.extensions'
 
+
 copper {
     projectName = "PcscSample"
 
@@ -120,3 +121,5 @@ dependencies {
 
     implementation "androidx.cardview:cardview:1.0.0"
 }
+
+apply from: rootProject.file('gradle/publish-app.gradle')

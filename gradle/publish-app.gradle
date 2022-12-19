@@ -1,0 +1,60 @@
+apply plugin: 'maven-publish'
+apply plugin: 'org.jetbrains.dokka'
+apply plugin: 'nu.studer.credentials'
+
+String userNexus = project.hasProperty('nexusUser') ?
+        project.nexusUser : (project.credentials.nexus_user ?
+        project.credentials.nexus_user : (project.properties.containsKey("nexus_user") ?
+        project.properties.nexus_user.toString() : ""))
+String passwordNexus = project.hasProperty('nexusPassword') ?
+        project.nexusPassword : (project.credentials.nexus_password ?
+        project.credentials.nexus_password : (project.properties.containsKey("nexus_password") ?
+        project.properties.nexus_password.toString() : ""))
+
+def artifactIdHook = { variant ->
+    if (variant.buildType.name == "release") {
+        return "$project.rootProject.name"
+    } else {
+        return "$project.rootProject.name-$variant.buildType.name"
+    }
+}
+
+project.android.applicationVariants.all { variant ->
+    if (variant.buildType.name != "debug") {
+        project.publishing.publications.create("${variant.name}", MavenPublication) {
+            // You can then customize attributes of the publication as shown below.
+            groupId variant.applicationId
+            artifactId "${artifactIdHook(variant)}"
+            version versioning.info.display
+
+            String flavors = ''
+            // Handle flavors
+            if (variant.productFlavors.size() > 0) {
+                flavors = "${variant.productFlavors.collect { it.name }.join('-')}"
+                project.logger.info "Flavors : $flavors"
+            }
+
+            // Set artifact
+            variant.outputs.all { output ->
+                project.logger.info "Artifact : ${output.outputFile}"
+                artifact(output.outputFile) {
+                    classifier = flavors
+                }
+            }
+        }
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name "nexus"
+            url = "https://nexus.coppernic.fr/repository/apps-release-coppernic"
+            credentials {
+                username userNexus
+                password passwordNexus
+            }
+        }
+    }
+}
+
