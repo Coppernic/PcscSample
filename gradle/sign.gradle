@@ -1,0 +1,132 @@
+class KeyInfo {
+    public final static int USER = 0
+    public final static int SYSTEM = 1
+
+    final String name
+    String storePassword = ""
+    String keyPassword = ""
+    String keyAlias = ""
+    File key = null
+    File debugKey = null
+    int type
+
+    KeyInfo(String name) {
+        this.name = name
+    }
+}
+
+class KeyWalker {
+    static List<KeyInfo> scan(File dir) {
+        List<KeyInfo> keyInfoList = []
+        dir.eachDir {
+            if (!it.name.startsWith(".")) {
+                keyInfoList.add(scanDir(it))
+            }
+        }
+        return keyInfoList
+    }
+
+    private static KeyInfo scanDir(File dir) {
+        KeyInfo info = new KeyInfo(dir.name)
+        dir.eachFile { File f ->
+            if (f.name.endsWith(".properties")) {
+                parseProperties(info, f)
+            } else if (f.name.endsWith(".jks")) {
+                if (f.name.matches(/.+[_-]debug.+/)) {
+                    info.debugKey = f
+                } else {
+                    info.key = f
+                }
+            }
+        }
+        return info
+    }
+
+    private static def parseProperties(KeyInfo info, File propertiesFile) {
+        Properties properties = new Properties()
+        propertiesFile.withInputStream {
+            properties.load(it)
+        }
+
+        info.keyAlias = properties.keyAlias
+        info.keyPassword = properties.keyPassword
+        info.storePassword = properties.storePassword
+        //System by default
+        if (properties.isSystem == "false") {
+            info.type = KeyInfo.USER
+        } else {
+            info.type = KeyInfo.SYSTEM
+        }
+    }
+}
+
+static List<KeyInfo> loadKeyInfoList() {
+    List<KeyInfo> keyInfoList = []
+    String home = System.getProperty("user.home")
+    File repo = new File("$home/.coppernic/AndroidDeviceKeys")
+
+    if (repo.isDirectory()) {
+        keyInfoList = KeyWalker.scan(repo)
+    }
+    return keyInfoList.sort { it.name }
+}
+
+def createProductFlavor(Project project, KeyInfo info, String name, File key) {
+    logger.info "createProductFlavor with $info"
+    project.android.signingConfigs.create name, {
+        storeFile key
+        storePassword info.storePassword
+        keyAlias info.keyAlias
+        keyPassword info.keyPassword
+    }
+
+    project.android.productFlavors.create name, {
+        dimension "product"
+        signingConfig project.android.signingConfigs.getByName(name)
+        if (info.type == KeyInfo.SYSTEM) {
+            manifestPlaceholders = [sharedUserId: "android.uid.system"]
+        } else {
+            // Need to do this in after evaluate because applicationId is not set already
+            project.afterEvaluate {
+                println "shared user id is ${project.android.defaultConfig.applicationId}"
+                manifestPlaceholders = [sharedUserId: "${project.android.defaultConfig.applicationId}"]
+            }
+        }
+    }
+}
+
+def showDebugKey = false
+def isSystem = false
+def isUser = true
+
+List<KeyInfo> keyInfoList = loadKeyInfoList().findAll() { info ->
+    boolean keep = false
+    if (isSystem && info.type == KeyInfo.SYSTEM) {
+        logger.info "keep $info.name because it is system"
+        keep = true
+    }
+    if (isUser && info.type == KeyInfo.USER) {
+        logger.info "keep $info.name because it is user"
+        keep = true
+    }
+    return keep
+}
+
+android {
+    flavorDimensions += "product"
+
+    defaultConfig {
+        manifestPlaceholders = [sharedUserId: "${project.android.defaultConfig.applicationId}"]
+    }
+
+    buildTypes.debug.signingConfig null
+
+    keyInfoList.each { info ->
+        // Create flavor for release key
+        createProductFlavor(project, info, info.name, info.key)
+        // Create flavor for debug key
+        if (info.debugKey != null && showDebugKey) {
+            createProductFlavor(project, info, "${info.name}debug", info.debugKey)
+        }
+    }
+}

@@ -5,9 +5,13 @@ plugins {
 apply plugin: 'com.android.application'
 apply plugin: 'fr.coppernic.extensions'
 
+
 copper {
     projectName = "PcscSample"
 
+    android {
+        flavorDimensions += "peripheral"
+    }
     publications {
         artiConfig = project.hasProperty('artiServer') ? project.artiServer : "arti01"
     }
@@ -45,6 +49,46 @@ android {
         exclude 'META-INF/main.kotlin_module'
         exclude 'META-INF/lib_release.kotlin_module'
     }
+
+
+    productFlavors {
+        normal {
+            dimension "peripheral"
+//            versionNameSuffix ""
+            manifestPlaceholders = [appLabel:"@string/app_name"]
+            applicationId "fr.coppernic.samples.pcsc"
+        }
+        hiddev {
+            dimension "peripheral"
+            versionNameSuffix "-hiddev"
+            manifestPlaceholders = [appLabel:"@string/app_name_hiddev"]
+            applicationId "fr.coppernic.samples.pcsc.hid"
+        }
+        smartcard {
+            dimension "peripheral"
+            versionNameSuffix "-smartcard"
+            manifestPlaceholders = [appLabel:"@string/app_name_smartcard"]
+            applicationId "fr.coppernic.samples.pcsc.smartcard"
+        }
+    }
+
+    sourceSets {
+        normal {
+            java {
+                srcDir 'src/normal/java'
+            }
+        }
+        hiddev {
+            java {
+                srcDir 'src/hiddev/java'
+            }
+        }
+        smartcard {
+            java {
+                srcDir 'src/smartcard/java'
+            }
+        }
+    }
 }
 
 dependencies {
@@ -77,3 +121,5 @@ dependencies {
 
     implementation "androidx.cardview:cardview:1.0.0"
 }
+
+apply from: rootProject.file('gradle/publish-app.gradle')

@@ -1,0 +1,60 @@
+apply plugin: 'maven-publish'
+apply plugin: 'org.jetbrains.dokka'
+apply plugin: 'nu.studer.credentials'
+
+String userNexus = project.hasProperty('nexusUser') ?
+        project.nexusUser : (project.credentials.nexus_user ?
+        project.credentials.nexus_user : (project.properties.containsKey("nexus_user") ?
+        project.properties.nexus_user.toString() : ""))
+String passwordNexus = project.hasProperty('nexusPassword') ?
+        project.nexusPassword : (project.credentials.nexus_password ?
+        project.credentials.nexus_password : (project.properties.containsKey("nexus_password") ?
+        project.properties.nexus_password.toString() : ""))
+
+def artifactIdHook = { variant ->
+    if (variant.buildType.name == "release") {
+        return "$project.rootProject.name"
+    } else {
+        return "$project.rootProject.name-$variant.buildType.name"
+    }
+}
+
+task javadocJar(type: Jar, dependsOn: dokkaJavadoc) {
+    classifier = 'javadoc'
+    from dokkaJavadoc
+}
+
+task androidSourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.srcDirs
+}
+
+project.android.libraryVariants.all { variant ->
+    if (variant.buildType.name != "debug") {
+        project.publishing.publications.create("${variant.name}", MavenPublication) {
+            // Applies the component for the release build variant.
+            from components.getByName(variant.name)
+
+            artifact javadocJar
+            artifact androidSourcesJar
+
+            // You can then customize attributes of the publication as shown below.
+            groupId variant.applicationId
+            artifactId "${artifactIdHook(variant)}"
+            version versioning.info.display
+        }
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name "nexus"
+            url = "https://nexus.coppernic.fr/repository/libs-release-coppernic"
+            credentials {
+                username userNexus
+                password passwordNexus
+            }
+        }
+    }
+}

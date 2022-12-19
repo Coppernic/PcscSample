@@ -65,6 +65,13 @@ Access-ER HID contains one peripheral available with PCSC library :
 
 ```
 
+Current source code is using gradle flavors for different use cases :
+- **hiddev** to use HID peripherals
+- **smartcard** to use SmartCard peripherals
+- **normal** to use legacy PcscSample code (default peripheral)
+
+A specific file is defined for each flavor to define which peripheral is used in : fr/coppernic/samples/pcsc/ui/TerminalPeripheral.java
+
 * Implements power listener
 
 ```java
