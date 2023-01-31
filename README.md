@@ -3,8 +3,8 @@ Sample application for PC/SC reader on C-One2 e-ID and Access-ER HID.
 
 ## Prerequisites
 
-CpcSystemServices shall be installed on your device.
-Please install the last version available on FDroid available on www.coppernic.fr/fdroid.apk
+CoreServices shall be installed on your device.
+Please install the last version available on CopperApps available on www.coppernic.fr/CopperApps.apk
 
 
 ## Set up
