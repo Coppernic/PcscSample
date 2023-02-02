@@ -115,10 +115,10 @@ dependencies {
 
     // Coppernic
     implementation 'fr.coppernic.sdk.cpcutils:CpcUtilsLib:6.19.1'
-    implementation 'fr.coppernic.sdk.core:CpcCore:2.1.12'
+    implementation "fr.coppernic.sdk.core:CpcCore:$core_version"
     implementation 'fr.coppernic.lib:splash:0.3.0'
 
-    implementation 'fr.coppernic.sdk.pcsc2:pcsclib:master'
+    implementation "fr.coppernic.sdk.pcsc2:pcsclib:$core_version"
 
     implementation "androidx.cardview:cardview:1.0.0"
 }
