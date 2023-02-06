@@ -63,6 +63,9 @@ public class MainActivity extends AppCompatActivity {
                 //Wait for USB device to be ready
                 SystemClock.sleep(1000);
                 showMessage(getString(R.string.pcsc_explanation));
+
+                startPcscReader();
+
             } else {
                 Timber.e("Result %s, Peripheral %s", result.toString(), peripheral.toString());
                 showMessage(getString(R.string.power_error));
@@ -85,6 +88,20 @@ public class MainActivity extends AppCompatActivity {
             return handled;
         }
     };
+
+    private void startPcscReader() {
+        PcscReader.createPcscReader(getApplicationContext())
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSuccess(
+                it -> {
+                    reader = it;
+                    updateSpinner();
+                }
+            )
+            .subscribe();
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,16 +150,6 @@ public class MainActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
 
-        PcscReader.createPcscReader(getApplicationContext())
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnSuccess(
-                it -> {
-                    reader = it;
-                    updateSpinner();
-                }
-            )
-            .subscribe();
         //Init empty spinner
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_dropdown_item_1line,
