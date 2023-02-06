@@ -134,14 +134,14 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         PcscReader.createPcscReader(getApplicationContext())
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
             .doOnSuccess(
                 it -> {
                     reader = it;
                     updateSpinner();
                 }
             )
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
             .subscribe();
         //Init empty spinner
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this,
