@@ -25,7 +25,7 @@ import androidx.appcompat.widget.Toolbar;
 import fr.coppernic.sample.pcsc.BuildConfig;
 import fr.coppernic.sample.pcsc.R;
 import fr.coppernic.samples.pcsc.reader.PcscReader;
-import fr.coppernic.sdk.pcsc.ApduResponse;
+import fr.coppernic.sdk.pcsc2.ApduResponse;
 import fr.coppernic.sdk.power.PowerManager;
 import fr.coppernic.sdk.power.api.PowerListener;
 import fr.coppernic.sdk.power.api.peripheral.Peripheral;
@@ -33,6 +33,8 @@ import fr.coppernic.sdk.utils.core.CpcBytes;
 import fr.coppernic.sdk.utils.core.CpcResult;
 import fr.coppernic.sdk.utils.core.CpcResult.RESULT;
 import fr.coppernic.sdk.utils.ui.TextAppender;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity {
@@ -61,7 +63,9 @@ public class MainActivity extends AppCompatActivity {
                 //Wait for USB device to be ready
                 SystemClock.sleep(1000);
                 showMessage(getString(R.string.pcsc_explanation));
-                updateSpinner();
+
+                startPcscReader();
+
             } else {
                 Timber.e("Result %s, Peripheral %s", result.toString(), peripheral.toString());
                 showMessage(getString(R.string.power_error));
@@ -84,6 +88,20 @@ public class MainActivity extends AppCompatActivity {
             return handled;
         }
     };
+
+    private void startPcscReader() {
+        PcscReader.createPcscReader(getApplicationContext())
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSuccess(
+                it -> {
+                    reader = it;
+                    updateSpinner();
+                }
+            )
+            .subscribe();
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,9 +147,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
         setSupportActionBar(toolbar);
 
-        reader = new PcscReader(getApplicationContext());
         //Init empty spinner
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_dropdown_item_1line,
@@ -150,7 +168,6 @@ public class MainActivity extends AppCompatActivity {
         PowerManager.get().registerListener(powerListener);
         powerOn(true);
         swConnect.setEnabled(true);
-        updateSpinner();
 
 //        if (!checkPermissions()) {
 //            requestPermissions();
@@ -170,7 +187,15 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
     }
 
-//    @Override
+    @Override
+    protected void onResume() {
+        Timber.d("onResume");
+        super.onResume();
+
+        updateSpinner();
+    }
+
+        //    @Override
 //    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 //        switch (requestCode) {
 //            case REQUEST_PERMISSION_CODE: {
@@ -286,6 +311,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateSpinner() {
+        if (reader == null) {
+            Timber.d("PcscReader not initialized");
+            return;
+        }
         ArrayList<String> deviceList = reader.listReaders();
         if (deviceList != null) {
             ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this,
