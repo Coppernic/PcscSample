@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 Timber.e("Result %s, Peripheral %s", result.toString(), peripheral.toString());
                 showMessage(getString(R.string.power_error));
+                stopPcscReader();
             }
         }
 
@@ -102,7 +103,10 @@ public class MainActivity extends AppCompatActivity {
             .subscribe();
     }
 
-
+    private void stopPcscReader() {
+        reader.close();
+    }
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -121,4 +121,9 @@ public class PcscReader {
     public boolean isConnected() {
         return isConnected;
     }
+
+    public void close() {
+        if (sCard != null)
+            sCard.close();
+    }
 }
