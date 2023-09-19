@@ -114,7 +114,6 @@ dependencies {
     implementation 'com.github.d-max:spots-dialog:0.7@aar'
 
     // Coppernic
-    implementation 'fr.coppernic.sdk.cpcutils:CpcUtilsLib:6.19.1'
     implementation "fr.coppernic.sdk.core:CpcCore:$core_version"
     implementation 'fr.coppernic.lib:splash:0.3.0'
 
