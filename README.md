@@ -1,5 +1,5 @@
 # PcscSample
-Sample application for PC/SC reader on C-One2 e-ID and Access-ER HID.
+Sample application for PC/SC reader on C-One2 e-ID, IdPlatform, Access-ER HID and Access-ER e-ID Smartcard.
 
 ## Prerequisites
 
@@ -33,13 +33,13 @@ dependencies {
 
  * Define used peripheral
 
- Each terminal (C-One2 e-ID, Access-ER HID, IdPlatform), can contain one or more Pcsc reader.
+ Each terminal (C-One2 e-ID, Access-ER HID, IdPlatform and Access-ER e-ID Smartcard), can contain one or more Pcsc reader.
  Check their availability in technical specifications.
 
-https://www.coppernic.fr/c-one-2-e-id/
-https://www.coppernic.fr/access-er/
-https://www.coppernic.fr/access-er-e-id/
-https://www.coppernic.fr/id-platform/
+https://www.coppernic.fr/c-one-2-e-id/  
+https://www.coppernic.fr/access-er/  
+https://www.coppernic.fr/access-er-e-id/  
+https://www.coppernic.fr/id-platform/  
 
 C-One2 e-ID contains two peripherals available with PCSC library :
 - Contactless card reader RFID Elyctis reader
@@ -47,6 +47,15 @@ C-One2 e-ID contains two peripherals available with PCSC library :
 
 Access-ER HID contains one peripheral available with PCSC library :
 - Contactless card reader HID OMNIKEY 5127 CK-Mini
+
+Access-ER e-ID Smartcard :
+- Contactless card NFC reader 
+- Contact card reader & SAM reader
+
+IdPlatform :
+- Contactless card NFC reader
+- Contact card reader & SAM reader
+ 
 
 ```java
     private Peripheral getPeripheral() {
