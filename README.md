@@ -49,11 +49,9 @@ Access-ER HID contains one peripheral available with PCSC library :
 - Contactless card reader HID OMNIKEY 5127 CK-Mini
 
 Access-ER e-ID Smartcard :
-- Contactless card NFC reader 
 - Contact card reader & SAM reader
 
 IdPlatform :
-- Contactless card NFC reader
 - Contact card reader & SAM reader
  
 
