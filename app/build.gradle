@@ -115,7 +115,7 @@ dependencies {
 
     // Coppernic
     implementation "fr.coppernic.sdk.core:CpcCore:$core_version"
-    implementation 'fr.coppernic.lib:splash:0.3.0'
+    implementation 'fr.coppernic.lib.splash:splash:0.4.1'
 
     implementation "fr.coppernic.sdk.pcsc2:CpcCore:$core_version"
 
