@@ -3,21 +3,6 @@ plugins {
 }
 
 apply plugin: 'com.android.application'
-apply plugin: 'fr.coppernic.extensions'
-
-
-copper {
-    projectName = "PcscSample"
-
-    android {
-        flavorDimensions += "peripheral"
-    }
-    publications {
-        artiConfig = project.hasProperty('artiServer') ? project.artiServer : "arti01"
-    }
-}
-
-apply plugin: 'fr.coppernic.android'
 
 android {
     compileSdkVersion 33
@@ -50,6 +35,7 @@ android {
         exclude 'META-INF/lib_release.kotlin_module'
     }
 
+    flavorDimensions "peripheral"
 
     productFlavors {
         normal {
@@ -126,4 +112,6 @@ dependencies {
 
 }
 
+apply from: rootProject.file('gradle/ktlint.gradle')
+apply from: rootProject.file('gradle/sign.gradle')
 apply from: rootProject.file('gradle/publish-app.gradle')
