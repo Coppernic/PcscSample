@@ -13,15 +13,16 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.appcompat.widget.Toolbar;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.weiwangcn.betterspinner.library.material.MaterialBetterSpinner;
 
 import java.util.ArrayList;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SwitchCompat;
-import androidx.appcompat.widget.Toolbar;
 import fr.coppernic.sample.pcsc.BuildConfig;
 import fr.coppernic.sample.pcsc.R;
 import fr.coppernic.samples.pcsc.reader.PcscReader;
@@ -51,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
     EditText etApdu;
 
     private MenuItem itemClear;
-    private PcscReader reader;
+    private PcscReader reader = null;
 
     private final PowerListener powerListener = new PowerListener() {
         @Override
@@ -104,7 +105,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void stopPcscReader() {
-        reader.close();
+        if (reader != null) {
+            reader.close();
+        }
     }
     
     @Override
