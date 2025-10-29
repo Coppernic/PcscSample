@@ -5,12 +5,12 @@ plugins {
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 33
+    compileSdkVersion 34
 
     defaultConfig {
         applicationId "fr.coppernic.samples.pcsc"
-        minSdkVersion 27
-        targetSdkVersion 33
+        minSdkVersion 28
+        targetSdkVersion 34
         vectorDrawables.useSupportLibrary = true
         versionCode versioning.info.versionCode
         versionName versioning.info.display
@@ -35,23 +35,23 @@ android {
         exclude 'META-INF/lib_release.kotlin_module'
     }
 
-    flavorDimensions "peripheral"
+    flavorDimensions "product"
 
     productFlavors {
         normal {
-            dimension "peripheral"
+            dimension "product"
 //            versionNameSuffix ""
             manifestPlaceholders = [appLabel:"@string/app_name"]
             applicationId "fr.coppernic.samples.pcsc"
         }
         hiddev {
-            dimension "peripheral"
+            dimension "product"
             versionNameSuffix "-hiddev"
             manifestPlaceholders = [appLabel:"@string/app_name_hiddev"]
             applicationId "fr.coppernic.samples.pcsc.hid"
         }
         smartcard {
-            dimension "peripheral"
+            dimension "product"
             versionNameSuffix "-smartcard"
             manifestPlaceholders = [appLabel:"@string/app_name_smartcard"]
             applicationId "fr.coppernic.samples.pcsc.smartcard"
@@ -75,6 +75,7 @@ android {
             }
         }
     }
+    namespace 'fr.coppernic.sample.pcsc'
 }
 
 dependencies {
