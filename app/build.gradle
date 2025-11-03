@@ -35,23 +35,23 @@ android {
         exclude 'META-INF/lib_release.kotlin_module'
     }
 
-    flavorDimensions "product"
+    flavorDimensions "peripheral"
 
     productFlavors {
         normal {
-            dimension "product"
+            dimension "peripheral"
 //            versionNameSuffix ""
             manifestPlaceholders = [appLabel:"@string/app_name"]
             applicationId "fr.coppernic.samples.pcsc"
         }
         hiddev {
-            dimension "product"
+            dimension "peripheral"
             versionNameSuffix "-hiddev"
             manifestPlaceholders = [appLabel:"@string/app_name_hiddev"]
             applicationId "fr.coppernic.samples.pcsc.hid"
         }
         smartcard {
-            dimension "product"
+            dimension "peripheral"
             versionNameSuffix "-smartcard"
             manifestPlaceholders = [appLabel:"@string/app_name_smartcard"]
             applicationId "fr.coppernic.samples.pcsc.smartcard"
@@ -114,4 +114,5 @@ dependencies {
 }
 
 apply from: rootProject.file('gradle/ktlint.gradle')
+apply from: rootProject.file('gradle/sign.gradle')
 apply from: rootProject.file('gradle/publish-app.gradle')
