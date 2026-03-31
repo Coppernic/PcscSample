@@ -22,8 +22,8 @@ dependencies {
 // [...]
     // Coppernic
     implementation 'fr.coppernic.sdk.cpcutils:CpcUtilsLib:6.19.1'
-    implementation 'fr.coppernic.sdk.core:CpcCore:2.1.12'
-    implementation 'fr.coppernic.sdk.pcsc:CpcPcsc:1.5.4'
+    implementation "fr.coppernic.sdk.core:CpcCore:3.7.0"
+    implementation "fr.coppernic.sdk.pcsc2:CpcCore:3.7.0"
 // [...]
 }
 
@@ -36,10 +36,10 @@ dependencies {
  Each terminal (C-One2 e-ID, Access-ER HID, IdPlatform and Access-ER e-ID Smartcard), can contain one or more Pcsc reader.
  Check their availability in technical specifications.
 
-https://www.coppernic.fr/c-one-2-e-id/  
-https://www.coppernic.fr/access-er/  
-https://www.coppernic.fr/access-er-e-id/  
-https://www.coppernic.fr/id-platform/  
+https://www.coppernic.fr/c-one-2-e-id/
+https://www.coppernic.fr/access-er/
+https://www.coppernic.fr/access-er-e-id/
+https://www.coppernic.fr/id-platform/
 
 C-One2 e-ID contains two peripherals available with PCSC library :
 - Contactless card reader RFID Elyctis reader
@@ -53,7 +53,7 @@ Access-ER e-ID Smartcard :
 
 IdPlatform :
 - Contact card reader & SAM reader
- 
+
 
 ```java
     private Peripheral getPeripheral() {
@@ -191,5 +191,5 @@ PowerManager.get().power(this, ConePeripheral.RFID_ELYCTIS_LF214_USB, false);
        //Error sending APDU
     }else{
       //get your response in apduResponse
-    }    
+    }
 ```

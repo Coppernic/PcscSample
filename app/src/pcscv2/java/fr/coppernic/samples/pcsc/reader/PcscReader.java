@@ -15,16 +15,15 @@ import io.reactivex.Single;
 import timber.log.Timber;
 
 /**
- * Created by michael on 16/02/18.
+ * PSC/SC reader V2 is suitable ONLY for Coppernic device (HMD devices not included) from OS `20240813` and after.
+ * PCSC v2 is dependant of CoreService to run, thus cannot be run on HMD devices
  */
-
 public class PcscReader {
     // PCSC
     private SCard sCard = null;
     private boolean isConnected = false;
 
     private Context context;
-
     private String TAG = "PcscReader";
 
     private PcscReader(SCard sCard) {

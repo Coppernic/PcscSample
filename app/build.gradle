@@ -1,8 +1,15 @@
 plugins {
     id "fr.coppernic.versioning" version "3.1.2"
+    id 'org.jetbrains.kotlin.android'
 }
 
 apply plugin: 'com.android.application'
+
+// --- Reserved for Coppernic internal publishing ---
+apply from: rootProject.file('gradle/ktlint.gradle')
+apply from: rootProject.file('gradle/simple-sign.gradle')
+apply from: rootProject.file('gradle/publish-app.gradle')
+//----------------------------------------------------
 
 android {
     compileSdkVersion 34
@@ -24,8 +31,13 @@ android {
     }
 
     buildTypes {
+        debug {
+            minifyEnabled false
+            signingConfig signingConfigs.debug
+        }
         release {
             minifyEnabled false
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -36,83 +48,73 @@ android {
     }
 
     flavorDimensions "peripheral"
-
     productFlavors {
-        normal {
+        pcscv1 {
             dimension "peripheral"
-//            versionNameSuffix ""
-            manifestPlaceholders = [appLabel:"@string/app_name"]
+            versionNameSuffix "-pcscv1"
+            manifestPlaceholders = [appLabel:"@string/app_name_pcscv1"]
+            applicationId "fr.coppernic.samples.pcsc.fusion"
+        }
+        pcscv2 {
+            dimension "peripheral"
+            versionNameSuffix "-pcscv2"
+            manifestPlaceholders = [appLabel:"@string/app_name_pcscv2"]
             applicationId "fr.coppernic.samples.pcsc"
-        }
-        hiddev {
-            dimension "peripheral"
-            versionNameSuffix "-hiddev"
-            manifestPlaceholders = [appLabel:"@string/app_name_hiddev"]
-            applicationId "fr.coppernic.samples.pcsc.hid"
-        }
-        smartcard {
-            dimension "peripheral"
-            versionNameSuffix "-smartcard"
-            manifestPlaceholders = [appLabel:"@string/app_name_smartcard"]
-            applicationId "fr.coppernic.samples.pcsc.smartcard"
+            // ACCESS_PERIPHERAL values are HID, ASK or SEC1210, default is HID
+            buildConfigField "String", "ACCESS_PERIPHERAL", '"HID"'
         }
     }
 
     sourceSets {
-        normal {
+        pcscv1 {
             java {
-                srcDir 'src/normal/java'
+                srcDir 'src/pcscv1/java'
             }
         }
-        hiddev {
+        pcscv2 {
             java {
-                srcDir 'src/hiddev/java'
-            }
-        }
-        smartcard {
-            java {
-                srcDir 'src/smartcard/java'
+                srcDir 'src/pcscv2/java'
             }
         }
     }
     namespace 'fr.coppernic.sample.pcsc'
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    //Android
     implementation 'androidx.appcompat:appcompat:1.6.0'
     implementation 'com.google.android.material:material:1.8.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    implementation "androidx.cardview:cardview:1.0.0"
 
     // Timber
     implementation 'com.jakewharton.timber:timber:5.0.1'
-
-    //Canary
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
 
     //Material Design
     implementation "androidx.preference:preference:1.2.0"
     implementation "androidx.legacy:legacy-preference-v14:1.0.0"
     implementation 'com.weiwangcn.betterspinner:library-material:1.1.0'
-
     implementation 'com.github.d-max:spots-dialog:0.7@aar'
 
     // Coppernic
-    implementation "fr.coppernic.sdk.core:CpcCore:$core_version"
+    implementation "fr.coppernic.sdk.core:CpcCore:3.8.0"
     implementation 'fr.coppernic.lib.splash:splash:0.4.1'
+    pcscv1Implementation 'fr.coppernic.sdk.pcsc:CpcPcsc:1.6.0'
+    pcscv2Implementation "fr.coppernic.sdk.pcsc2:CpcCore:3.7.0"
 
-    implementation "fr.coppernic.sdk.pcsc2:CpcCore:$core_version"
-
-    implementation "androidx.cardview:cardview:1.0.0"
-
+    // RX-java
     implementation 'io.reactivex.rxjava2:rxjava:2.2.10'
     implementation "io.reactivex.rxjava2:rxandroid:2.1.1"
 
+    // Coroutine
+    implementation "androidx.lifecycle:lifecycle-common-java8:2.5.1"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.5.1"
 }
-
-apply from: rootProject.file('gradle/ktlint.gradle')
-apply from: rootProject.file('gradle/sign.gradle')
-apply from: rootProject.file('gradle/publish-app.gradle')
