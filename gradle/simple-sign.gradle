@@ -1,0 +1,85 @@
+Boolean isSystem = false
+String platform = "standard"
+
+android {
+    defaultConfig {
+        // Type of build
+        if (isSystem) {
+            manifestPlaceholders = [sharedUserId: "android.uid.system"]
+        } else {
+            manifestPlaceholders = [sharedUserId: "${project.android.defaultConfig.applicationId}"]
+        }
+    }
+    buildTypes.debug.signingConfig = null
+
+    signingConfigs {
+        release {
+            String path = System.getProperty("user.home")+"/"+AndroidKeysFolder.COPPERNIC_NAME+"/"+AndroidKeysFolder.REPO_NAME+"/"+platform
+            File propertiesFile = new File("$path/keystore.properties")
+            if (propertiesFile!=null && propertiesFile.exists()) {
+                Properties properties = new Properties()
+                propertiesFile.withInputStream {
+                    properties.load(it)
+                }
+                storeFile(new File("$path/platform.jks"))
+                storePassword(properties.getProperty("storePassword"))
+                keyAlias(properties.getProperty("keyAlias"))
+                keyPassword(properties.getProperty("keyPassword"))
+            }
+        }
+    }
+}
+
+task fetchAndroidDeviceKeys {
+    AndroidKeysFolder.updateRepo()
+}
+
+class AndroidKeysFolder {
+    static final String COPPERNIC_NAME = ".coppernic"
+    static final String REPO_NAME = "AndroidDeviceKeys"
+    static final String branch = "master"
+    static final String repo = "git@gitlab.coppernic.fr:Confidential/AndroidDeviceKeys.git"
+
+    static def updateRepo() {
+        File home = new File(System.getProperty("user.home"))
+        File repoRoot = new File(home, COPPERNIC_NAME)
+        if (repoRoot.exists() && repoRoot.isDirectory()) {
+            return null
+        } else if (repoRoot.exists()) {
+            repoRoot.delete()
+        }
+        repoRoot.mkdir()
+        File repoDir = new File(repoRoot, REPO_NAME)
+        try {
+            if (repoDir.exists() && repoDir.isDirectory()) {
+                // Update in background
+                Shell.execute("git pull", repoDir)
+            } else {
+                Shell.execute("git clone -b $branch $repo", repoRoot)
+            }
+        } catch (Exception e) {
+            e.printStackTrace()
+        }
+    }
+}
+
+class Shell {
+    static def execute(String command, File workingDir) {
+        println command
+        def process = new ProcessBuilder(addShellPrefix(command))
+                .directory(workingDir)
+                .redirectErrorStream(true)
+                .start()
+        process.inputStream.eachLine { println it }
+        process.waitFor()
+        return process.exitValue()
+    }
+
+    private static def addShellPrefix(String command) {
+        def commandArray = new String[3]
+        commandArray[0] = "sh"
+        commandArray[1] = "-c"
+        commandArray[2] = command
+        return commandArray
+    }
+}
