@@ -111,7 +111,9 @@ dependencies {
 
     implementation 'fr.coppernic.lib.splash:splash:0.4.1'
     pcscv1Implementation 'fr.coppernic.sdk.pcsc:CpcPcsc:1.7.0'
-    pcscv2Implementation "fr.coppernic.sdk.pcsc2:CpcCore:3.7.0"
+    pcscv2Implementation("fr.coppernic.sdk.pcsc2:CpcCore:3.7.0")  {
+        exclude group: "fr.coppernic.external", module: "D2xx"
+    }
 
     // RX-java
     implementation 'io.reactivex.rxjava2:rxjava:2.2.10'
@@ -123,6 +125,6 @@ dependencies {
 
 
     // FTDI for Fusion support
-    implementation(files("libs/d2xx.jar"))
+    pcscv1Implementation(files("libs/d2xx.jar"))
 
 }
