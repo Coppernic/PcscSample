@@ -37,6 +37,26 @@
                 android:name="activity"
                 android:value="fr.coppernic.samples.pcsc.ui.MainActivity"/>
         </activity>
+
+        <activity
+            android:name="fr.coppernic.sdk.usboutlet.UsbAttachActivity"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"/>
+            </intent-filter>
+
+            <meta-data
+                android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
+                android:resource="@xml/device_filter"/>
+        </activity>
+
+        <activity
+            android:name="fr.coppernic.sdk.usboutlet.UsbConfigurationActivity"
+            android:exported="false"
+            android:noHistory="true"
+            android:excludeFromRecents="true" />
+
     </application>
 
 </manifest>

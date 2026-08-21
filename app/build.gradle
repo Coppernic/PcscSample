@@ -105,9 +105,12 @@ dependencies {
     implementation 'com.github.d-max:spots-dialog:0.7@aar'
 
     // Coppernic
-    implementation "fr.coppernic.sdk.core:CpcCore:3.8.0"
+    implementation("fr.coppernic.sdk.core:CpcCore:3.8.0")  {
+        exclude group: "fr.coppernic.external", module: "D2xx"
+    }
+
     implementation 'fr.coppernic.lib.splash:splash:0.4.1'
-    pcscv1Implementation 'fr.coppernic.sdk.pcsc:CpcPcsc:1.6.0'
+    pcscv1Implementation 'fr.coppernic.sdk.pcsc:CpcPcsc:1.7.0'
     pcscv2Implementation "fr.coppernic.sdk.pcsc2:CpcCore:3.7.0"
 
     // RX-java
@@ -117,4 +120,9 @@ dependencies {
     // Coroutine
     implementation "androidx.lifecycle:lifecycle-common-java8:2.5.1"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.5.1"
+
+
+    // FTDI for Fusion support
+    implementation(files("libs/d2xx.jar"))
+
 }
