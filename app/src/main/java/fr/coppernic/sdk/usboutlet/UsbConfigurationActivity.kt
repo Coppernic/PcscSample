@@ -13,7 +13,6 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import com.ftdi.j2xx.D2xxManager
 import com.ftdi.j2xx.FT_Device
 import fr.coppernic.sdk.power.OutletPowerManager
 import kotlin.coroutines.cancellation.CancellationException
@@ -23,21 +22,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
-
-const val FTDI_VID = 0x0403
-const val FTDI_PID_1 = 0x6010
-const val FTDI_PID_2 = 0x6015
-
-const val SEC1210_VID = 0x0424
-const val SEC1210_PID = 0x1202
-
-const val SET_GPIO_OUTPUT_ALL_HIGH = 0xF0
-
-const val SET_GPIO_OUTPUT_ALL_LOG = 0xFF
-
-const val SET_BIT_MODE = 0x20
-const val FTDI_CONFIGURATION_DELAY = 2000L
-
 class UsbConfigurationActivity : AppCompatActivity() {
 
     companion object {
@@ -131,17 +115,14 @@ class UsbConfigurationActivity : AppCompatActivity() {
     private suspend fun configureUsb(): Boolean {
         try {
 
-            if (!isUsbDeviceReady(FTDI_VID, listOf(FTDI_PID_1, FTDI_PID_2))) {
-                if (!setupFtdi()) {
-                    Log.e(TAG, "Unable to setup FTDI")
-                    return false
-                }
+            if (!setupFtdi()) {
+                Log.e(TAG, "Unable to setup FTDI")
+                return false
             }
 
-            if (!isUsbDeviceReady(SEC1210_VID, listOf(SEC1210_PID))) {
-                if (!setupSmartCardReader()) {
-                    return false
-                }
+            if (!setupSmartCardReader()) {
+                Log.e(TAG, "Unable to setup SmartCard reader")
+                return false
             }
 
             /*
@@ -160,7 +141,11 @@ class UsbConfigurationActivity : AppCompatActivity() {
         }
     }
 
-    private suspend fun setupFtdi(): Boolean {/*
+    private suspend fun powerOutlet(): Boolean {
+        if (findUsbDevice(usbManager, FTDI_VID, listOf(FTDI_PID_1, FTDI_PID_2)) != null) {
+            Log.d(TAG, "FTDI already powered")
+            return true
+        }/*
          * 1. Power the outlet.
          *
          * this call blocks until the outlet is powered
@@ -191,6 +176,18 @@ class UsbConfigurationActivity : AppCompatActivity() {
         Log.i(TAG, "device detected: ${ftdiDevice.deviceName}")
         Log.i(TAG, "device is Ftdi : ${ftdiDevice.isFtdi()}")
 
+        return true
+    }
+
+    private suspend fun setupFtdi(): Boolean {
+        if (!powerOutlet()) {
+            return false
+        }
+
+        val ftdiDevice = findUsbDevice(
+            usbManager, FTDI_VID, listOf(FTDI_PID_1, FTDI_PID_2)
+        ) ?: return false
+
         /*
          * 3. Get FTDI permission, only when necessary.
          */
@@ -201,38 +198,16 @@ class UsbConfigurationActivity : AppCompatActivity() {
         return true
     }
 
-    private suspend fun setupSmartCardReader(): Boolean {/*
-         * 1. Use FTDI to power SEC1210.
-         */
-        val ftdiDevice = findUsbDevice(FTDI_VID, listOf(FTDI_PID_1, FTDI_PID_2)) ?: return false
-        if (!powerSmartCardReader(ftdiDevice)) {
+    private suspend fun setupSmartCardReader(): Boolean {
+        if (!powerSmartCardReader()) {
             Log.e(TAG, "Unable to power smart card reader")
             return false
         }
 
-        /*
-         * 2. SEC1210 should now appear on USB.
-         */
-        Log.i(TAG, "Waiting for SEC1210")
+        val sec1210USbDevice =
+            findUsbDevice(usbManager, SEC1210_VID, listOf(SEC1210_PID)) ?: return false
 
-        val sec1210 = withContext(Dispatchers.IO) {
-
-            waitForUsbDevice(
-                SEC1210_VID, listOf(SEC1210_PID), DEVICE_ENUM_TIMEOUT_MS
-            )
-        }
-
-        if (sec1210 == null) {
-            Log.e(TAG, "SEC1210 did not appear")
-            return false
-        }
-
-        Log.i(TAG, "SEC1210 detected: ${sec1210.deviceName}")
-
-        /*
-         * 3. Request SEC1210 permission, only if necessary.
-         */
-        if (!ensureUsbPermission(sec1210)) {
+        if (!ensureUsbPermission(sec1210USbDevice)) {
             Log.e(TAG, "SEC1210 permission not granted")
             return false
         }
@@ -253,26 +228,13 @@ class UsbConfigurationActivity : AppCompatActivity() {
         var device: UsbDevice? = null
 
         while (device == null) {
-            device = findUsbDevice(vendorId, productIdList)
+            device = findUsbDevice(usbManager, vendorId, productIdList)
 
             if (device == null) {
                 delay(POLL_DELAY_MS)
             }
         }
         device
-    }
-
-    private fun findUsbDevice(
-        vendorId: Int, productIdList: List<Int>
-    ): UsbDevice? {
-
-        Log.d(TAG, "${usbManager.deviceList.size} devices found")
-        usbManager.deviceList.forEach {
-            Log.d(TAG, "device: ${it.value.deviceName}")
-        }
-        return usbManager.deviceList.values.firstOrNull { device ->
-            device.vendorId == vendorId && productIdList.contains(device.productId)
-        }
     }
 
     /**
@@ -337,75 +299,33 @@ class UsbConfigurationActivity : AppCompatActivity() {
     /**
      * FTDI CBUS command that powers the smart card reader.
      */
-    private suspend fun powerSmartCardReader(
-        device: UsbDevice
-    ): Boolean = withContext(Dispatchers.IO) {
+    private suspend fun powerSmartCardReader(): Boolean = withContext(Dispatchers.IO) {
+        if (findUsbDevice(usbManager, SEC1210_VID, listOf(SEC1210_PID)) != null) {
+            Log.d(TAG, "Smart Card reader already powered")
+            return@withContext true
+        }
 
-        try {
-            val d2xxManager = D2xxManager.getInstance(this@UsbConfigurationActivity)
+        if (!FtdiManager.powerSmartCardReader(context = this@UsbConfigurationActivity)) {
+            Log.e(TAG, "Error while powering Smartcard reader with FTDI")
+            return@withContext false
+        }
 
+        Log.i(TAG, "Waiting for SEC1210")
 
-            val count = d2xxManager.createDeviceInfoList(this@UsbConfigurationActivity)
-
-            if (count == 0) {
-                Log.e(TAG, "D2xx createDeviceInfoList() count == 0")
-                return@withContext false
-            }
-
-            ftDevice = d2xxManager.openByUsbDevice(
-                this@UsbConfigurationActivity, device
+        val sec1210 = waitForUsbDevice(
+                SEC1210_VID, listOf(SEC1210_PID), DEVICE_ENUM_TIMEOUT_MS
             )
 
-            if (ftDevice == null) {
-                Log.e(TAG, "D2xx openByUsbDevice() failed")
-                return@withContext false
-            }
-
-            try {
-
-                ftDevice?.apply {
-                    resetDevice()
-                    setBaudRate(9600)
-                    setDataCharacteristics(
-                        D2xxManager.FT_DATA_BITS_8,
-                        D2xxManager.FT_STOP_BITS_1,
-                        D2xxManager.FT_PARITY_NONE
-                    )
-                }
-
-                val mask = computeFtdiGpioOutputMask(false, false, false, true)
-                ftDevice?.setBitMode(mask, SET_BIT_MODE.toByte())
-                delay(FTDI_CONFIGURATION_DELAY)
-
-                Log.i(TAG, "Smart card reader power enabled")
-
-                true
-
-            } finally {
-                // ftDevice should not be closed, it creates a race condition issue
-                //                ftDevice.close()
-            }
-
-        } catch (e: Exception) {
-            Log.e(TAG, "FTDI communication failed", e)
-            false
+        if (sec1210 == null) {
+            Log.e(TAG, "SEC1210 did not appear")
+            return@withContext false
         }
+
+        Log.i(TAG, "SEC1210 detected: ${sec1210.deviceName}")
+
+        return@withContext true
+
     }
-
-    private fun computeFtdiGpioOutputMask(
-        gpio0: Boolean, gpio1: Boolean, gpio2: Boolean, gpio3: Boolean
-    ): Byte {
-
-        val direction = 0xF shl 4
-        var values = 0
-        if (!gpio0) values = values or (1 shl 0)
-        if (!gpio1) values = values or (1 shl 1)
-        if (!gpio2) values = values or (1 shl 2)
-        if (!gpio3) values = values or (1 shl 3)
-
-        return (direction or values).toByte()
-    }
-
 
     private fun registerPermissionReceiver() {
         ContextCompat.registerReceiver(
@@ -431,15 +351,5 @@ class UsbConfigurationActivity : AppCompatActivity() {
         }
     }
 
-    fun isUsbDeviceReady(vendorId: Int, productIdList: List<Int>): Boolean {
-        val device = findUsbDevice(vendorId, productIdList) ?: return false
-        return usbManager.hasPermission(device)
-    }
-
-}
-
-
-fun UsbDevice.isFtdi(): Boolean {
-    return (this.productId == FTDI_PID_1 || this.productId == FTDI_PID_2) && this.vendorId == FTDI_VID
 }
 
