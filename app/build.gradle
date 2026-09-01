@@ -110,7 +110,7 @@ dependencies {
     }
 
     implementation 'fr.coppernic.lib.splash:splash:0.4.1'
-    pcscv1Implementation 'fr.coppernic.sdk.pcsc:CpcPcsc:1.7.0'
+    pcscv1Implementation 'fr.coppernic.sdk.pcsc:CpcPcsc:1.7.1'
     pcscv2Implementation("fr.coppernic.sdk.pcsc2:CpcCore:3.7.0")  {
         exclude group: "fr.coppernic.external", module: "D2xx"
     }
