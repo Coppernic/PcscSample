@@ -1,11 +1,7 @@
 package fr.coppernic.samples.pcsc.ui;
 
-import static fr.coppernic.sdk.power.OutletPowerManager.ACTION_USB_PERMISSION;
-
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -17,7 +13,10 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
@@ -33,6 +32,7 @@ import fr.coppernic.sample.pcsc.R;
 import fr.coppernic.samples.pcsc.reader.PcscReader;
 import fr.coppernic.sdk.pcsc.ApduResponse;
 import fr.coppernic.sdk.power.OutletPowerManager;
+import fr.coppernic.sdk.usboutlet.UsbConfigurationManager;
 import fr.coppernic.sdk.utils.core.CpcBytes;
 import fr.coppernic.sdk.utils.core.CpcResult;
 import fr.coppernic.sdk.utils.core.CpcResult.RESULT;
@@ -40,6 +40,21 @@ import fr.coppernic.sdk.utils.ui.TextAppender;
 import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity {
+
+    private UsbConfigurationManager usbConfigurationManager;
+
+    private final ActivityResultLauncher<Intent> usbConfigurationLauncher =
+        registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK) {
+                    startPcscReader();
+                } else {
+                    handleUsbConfigurationFailure();
+                }
+            }
+        );
+
 
     FloatingActionButton fab;
     Toolbar toolbar;
@@ -69,6 +84,25 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        initUi();
+
+        usbConfigurationManager = new UsbConfigurationManager(this);
+    }
+
+    private void initializeUsb() {
+        // If SmartCard reader is powered and permission granted, no need to launch configuration activity
+        if (usbConfigurationManager.isSmartCardReaderReady()) {
+            startPcscReader();
+        } else {
+            usbConfigurationLauncher.launch(
+                UsbConfigurationManager.Companion.createConfigurationIntent(this)
+            );
+        }
+    }
+
+    private void initUi() {
+
         initTitle();
 
         fab = findViewById(R.id.fab);
@@ -113,37 +147,33 @@ public class MainActivity extends AppCompatActivity {
 
         //Init empty spinner
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_dropdown_item_1line,
-                new ArrayList<String>());
+            android.R.layout.simple_dropdown_item_1line,
+            new ArrayList<String>());
         spReader.setAdapter(arrayAdapter);
         etResult.clearFocus();
 
         etApdu.setOnEditorActionListener(editorActionListener);
+
+        showFAB(false);
+
+        swConnect.setEnabled(false);
+    }
+
+    private void handleUsbConfigurationFailure() {
+        Toast.makeText(this, "USB configuration failed", Toast.LENGTH_SHORT).show();
+        finish();
     }
 
     @Override
     protected void onStart() {
         Timber.d("onStart");
         super.onStart();
-        showFAB(false);
-
-        // Register USB receiver
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(ACTION_USB_PERMISSION);
-        registerReceiver(usbReceiver, filter, RECEIVER_EXPORTED);
-
-        powerOn();
+        initializeUsb();
     }
 
     @Override
     protected void onStop() {
         Timber.d("onStop");
-        // Unregister USB receiver
-        try {
-            unregisterReceiver(usbReceiver);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         stopPcscReader();
         super.onStop();
     }
@@ -198,38 +228,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     //endregion
-
-
-    //region USB
-    private BroadcastReceiver usbReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (ACTION_USB_PERMISSION.equalsIgnoreCase(action)) {
-                swConnect.setEnabled(true);
-                startPcscReader();
-            }
-        }
-    };
-    //endregion
-
-
-    // region Methods
-    void powerOn() {
-        if (!manager.isPowerOn(getApplicationContext())) {
-            Coroutines coroutines = new Coroutines();
-            manager.powerOn(MainActivity.this, 10000L, coroutines.getContinuation(
-                    (res, err) -> {
-                        try {
-                            Thread.sleep(500L);
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-                        manager.getUsbPermissions(MainActivity.this);
-                    }
-            ));
-        }
-    }
 
     void connectCard() {
         if (reader != null) {
@@ -325,6 +323,8 @@ public class MainActivity extends AppCompatActivity {
                     deviceList);
             spReader.setAdapter(arrayAdapter);
         }
+
+        swConnect.setEnabled(deviceList != null);
     }
 //endregion
 }
