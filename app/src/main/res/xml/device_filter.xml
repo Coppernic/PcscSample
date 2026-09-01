@@ -1,13 +1,5 @@
 <!-- res/xml/device_filter.xml -->
 <resources>
-    <!--FTDI : VID = 0x0403 in decimal VID = 1027, PID = 0x6015 in decimal PID = 24597-->
-    <usb-device vendor-id="1027" product-id="24597" />
-    <!--Five-O : VID = 0x113F in decimal VID = 4415, PID = 0x1500 in decimal PID = 5376-->
-    <usb-device vendor-id="4415" product-id="5376" />
-    <!--OCR : VID = 0x0DB5 in decimal VID = 3509, PID = 0x013D in decimal PID = 317-->
-    <usb-device vendor-id="3509" product-id="317" />
-    <!--Iris : VID = 0x1F63 in decimal VID = 8035, PID = 0xC801 in decimal PID = 51201-->
-    <usb-device vendor-id="8035" product-id="51201" />
     <!--Smart card SEC1210 : VID = 0x0424 in decimal VID = , PID = 0x1202 in decimal PID = -->
         <usb-device vendor-id="1060" product-id="4610" />
 </resources>
