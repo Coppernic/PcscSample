@@ -23,10 +23,6 @@ android {
         versionName versioning.info.display
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
-        ndk {
-            abiFilters "armeabi", "armeabi-v7a"
-        }
-
         multiDexEnabled true
     }
 
